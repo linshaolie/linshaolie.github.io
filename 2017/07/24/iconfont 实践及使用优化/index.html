@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    iconfont 实践及使用优化 |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-iconfont 实践及使用优化" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      iconfont 实践及使用优化
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2017/07/24/iconfont 实践及使用优化/" class="article-date">
+  <time datetime="2017-07-23T16:00:00.000Z" itemprop="datePublished">2017-07-24</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p>公司在前一段时间将大量图标进行了<strong>iconfont</strong>的替换，大大缩减了app的size。这几天，寻思着在自己app上也使用 iconfont，并且在使用上进行优化，使其在xib和 storyboard 上能像 UIImageView 那样所写即所见，所见即所得。</p>
+<p>iconfont 即通过自体形式进行 icon 的展示。其最大特点就是矢量性，即放大图标不虚化。</p>
+<p>下面先快速介绍下从创建到使用的过程以及对其使用进行优化，具体如下几点：</p>
+<ol>
+<li>创建 iconfont 图标；</li>
+<li>创建 iconfont 字体裤；</li>
+<li>使用图标字体库；</li>
+<li>在 iOS 使用上优化</li>
+</ol>
+<h2 id="创建-iconfont-图标"><a href="#创建-iconfont-图标" class="headerlink" title="创建 iconfont 图标"></a>创建 iconfont 图标</h2><p>作为一个程序员，说真的我不会画图标，也觉得画起来特别烦，琐。好在阿里巴巴为我们提供了极大的便利。上网站：<a href="http://www.iconfont.cn" target="_blank" rel="noopener">http://www.iconfont.cn</a></p>
+<p>在这个网站你不仅可以上传自己设计的字体图标，更重要的是这里有超多牛逼设计师已经设计好的 icon，你只需要根据自己app的需要进行搜索，然后聚合起来，再生成一个字体库就能使用了。当然了，如果你对某个 icon 觉得不满意，你完全可以直接对它进行<strong>简单</strong>编辑哈。使用起来绝对666。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-a3e00c208ce84936.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="网站首页"></p>
+<p>下面介绍下在别人创建好的 icon 上进行修改和保存。</p>
+<p>首先在首页上随便选择一个图标库，进入图标库详情后，挑选一个想修改的图标并将其加入购物车，然后添加到自己的项目上，接着在你创建的项目上即可看到这个图标。光标移动到图标，点击编辑即可。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-21ba57a5905bcb52.gif?imageMogr2/auto-orient/strip" alt="add icon"></p>
+<h2 id="生成字体库"><a href="#生成字体库" class="headerlink" title="生成字体库"></a>生成字体库</h2><p>在选择了需要的图标并添加到项目后，点击【下载至本地】即可生成图标字体库。顺便说一下，创建项目时会让你指定字体库名称（默认是 iconfont），可以根据自己需要进行命名（在使用时会用到这个字体库名称）。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-de376418d70ef6ec.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="new project"></p>
+<p>下载到本地后，我们其目录结构如下：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-961ee8e79448ac4c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="目录结构"></p>
+<h2 id="使用图标字体库"><a href="#使用图标字体库" class="headerlink" title="使用图标字体库"></a>使用图标字体库</h2><p>因为后面会在 iOS 使用上进行优化，所以这里主要介绍在 iOS 上的使用。在android 和 web 上的使用可以参考官网的介绍：  <a href="http://iconfont.cn/help/detail?spm=a313x.7781069.1998910419.d8cf4382a&amp;helptype=code" target="_blank" rel="noopener">http://iconfont.cn/help/detail?spm=a313x.7781069.1998910419.d8cf4382a&amp;helptype=code</a></p>
+<h2 id="iOS上的使用"><a href="#iOS上的使用" class="headerlink" title="iOS上的使用"></a>iOS上的使用</h2><p>其实这就是导入自定义字体，步骤是一模一样。</p>
+<p>1.创建一个项目，选择 <em>Single View Application</em>，填写项目名称，完成。如下图：</p>
+<p>（步骤太简单，图片不好意思显示）</p>
+<p>2.把下载的字体库 <strong>iconfont.ttf</strong> 文件拖入项目中，勾上 <em>Copy Items If Needed</em>，点击【Finish】；<br>（步骤太简单，图片不好意思显示）</p>
+<p>3.选择 <em>Info.plist</em> 文件，添加一个 key，名称为 <strong>UIAppFonts</strong>，回车。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-a26b31d6346011ab.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="添加字体key"></p>
+<p>4.这时新建的这一项应该是个数组类型，在 item0 的 Value 项填上<strong>字体名称</strong>（注意是字体名称，不是 ttf 文件名称，即上面提到的在创建字体的时候所填的名称）</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-52f28323821b65d0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="添加自定义字体"></p>
+<p>5.在 storyboard 上放置一个 UILabel 或 UIButton，设置为自定义字体，选择新添加的字体</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-541e7ab506dc6120.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="创建label"></p>
+<p>6.ctrl + 拖动控件，关联属性</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-cbcbe63b54258770.gif?imageMogr2/auto-orient/strip" alt="关联属性"></p>
+<p>7.设置字体图标 Unicode<br>在我们下载的字体目录中，有个 <em>demo_unicode.html</em> 文件，打开它可以看到每个图标对呀的 Unicode 编号。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-e0f276885d1695a5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="图标Unicode"></p>
+<p>给 label 的 text 设置上相应的值即可。如下：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 灯泡</span></span><br><span class="line">    _iconLabel.text = <span class="string">@"\U0000e881"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>8.编译运行</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-ef1adb7163e4a32b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="运行结果"></p>
+<hr>
+<h2 id="优化部分"><a href="#优化部分" class="headerlink" title="优化部分"></a>优化部分</h2><p>以上就是创建和使用 iconfont 的这个过程。使用起来倒不麻烦，就是有几个缺点：</p>
+<ol>
+<li>每次使用图标都得查一下对应的 Unicode 编号；</li>
+<li>对应着一堆 “\U0000xxxx”，如果不写注释，真不知道是什么东西；</li>
+<li>如果是使用存代码创建label，那通过代码设置图标还说得过去，但是使用 xib 或 storyboard 的时候还得用过一行代码来设置就有点说不过去了；</li>
+</ol>
+<p>这么说确实感觉挺麻烦的，有问题就有解决的答案。下面，介绍下我是怎么逐一解决这些问题的。</p>
+<p><strong>问题2和3</strong>：能不能看着编码就知道是什么图标呢？怎样在 xib 上创建 label 的时候同时给设置上图标值呢？<br>解决方案： 通过继承 label，结合 <code>IB_DESIGNABLE</code> 就能办到。</p>
+<p>首先创建 UILabel 子类 IconLabel，添加属性 iconName，顺便拓展下 IconLabel 功能，多添加个属性 selectedIconName，这样 IconLabel 就可以直接通过改变 selected 状态来改变预先设置好的图标了，如下代码：</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">IconLabel</span> : <span class="title">UILabel</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/// 设置选中状态</span></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>) <span class="built_in">BOOL</span> selected;</span><br><span class="line"><span class="comment">/// 普通状态下的图片名称（只需要后面的4位 16 进制， 如：f3f7)</span></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>, <span class="keyword">nullable</span>) <span class="built_in">NSString</span> *iconName;</span><br><span class="line"><span class="comment">/// 被选中状态下的图片名称（只需要后面的4位 16 进制，如：f3f7)</span></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>, <span class="keyword">nullable</span>) <span class="built_in">NSString</span> *selectedIconName;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>重写 iconName 和 selectedIconName <code>setter</code> 方法：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#pragma mark - setter and getter</span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)setIconName:(<span class="built_in">NSString</span> *)iconName &#123;</span><br><span class="line">    <span class="built_in">NSString</span> *iName = iconUnicodeWithName(iconName);</span><br><span class="line">    <span class="keyword">if</span> (iName != _iconName) &#123;</span><br><span class="line">        _iconName = iName;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)setSelectedIconName:(<span class="built_in">NSString</span> *)selectedIconName &#123;</span><br><span class="line">    <span class="built_in">NSString</span> *iName = iconUnicodeWithName(selectedIconName);</span><br><span class="line">    <span class="keyword">if</span> (iName != _selectedIconName) &#123;</span><br><span class="line">        _selectedIconName = iName;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中 iconUnicodeWithName，是通过 <code>NSScanner</code> 将16进制字符串进行扫描，并转换为Unicode，如下：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">NSString *<span class="title">iconUnicodeWithName</span><span class="params">(NSString *name)</span> </span>&#123;</span><br><span class="line">    NSScanner *scanner = [NSScanner scannerWithString:name];</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> code;</span><br><span class="line">    [scanner scanHexInt:&amp;code];</span><br><span class="line">    <span class="keyword">return</span> [NSString stringWithFormat:@<span class="string">"%C"</span>, (<span class="keyword">unsigned</span> <span class="keyword">short</span>)code];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最后，因为我们要在 xib 上直接进行值的设置，所有需要为 IconLabel 类和其想在 xib 上显示的属性设置上关键字，如下：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">IB_DESIGNABLE</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">IconLabel</span> : <span class="title">UILabel</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/// 设置选中状态</span></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>) <span class="built_in">BOOL</span> selected;</span><br><span class="line"><span class="comment">/// 普通状态下的图片名称（只需要后面的4位 16 进制， 如：f3f7)</span></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>, <span class="keyword">nullable</span>) IBInspectable <span class="built_in">NSString</span> *iconName;</span><br><span class="line"><span class="comment">/// 被选中状态下的图片名称（只需要后面的4位 16 进制，如：f3f7)</span></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>, <span class="keyword">nullable</span>) IBInspectable <span class="built_in">NSString</span> *selectedIconName;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>其中 <code>IB_DESIGNABLE</code> 标识该类为可设计类， <code>IBInspectable</code> 标识属性为可视察属性（下面就能看到效果）。</p>
+<p>为了能让设置的值对应的图标实时显示，我们需要重写 UILabel 的 <code>prepareForInterfaceBuilder</code> 方法，为了不需要手动设置字体名称，我们需要在 <code>awakeFromNib</code> 方法上进行默认字体的设置，如下：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#define IconFontName @<span class="meta-string">"my_like_icon"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">IconLabel</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)awakeFromNib &#123;</span><br><span class="line">    [<span class="keyword">super</span> awakeFromNib];</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">self</span> setupFontWithSize:<span class="keyword">self</span>.font.pointSize];</span><br><span class="line">    [<span class="keyword">self</span> reloadView];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)prepareForInterfaceBuilder &#123;</span><br><span class="line">    [<span class="keyword">super</span> prepareForInterfaceBuilder];</span><br><span class="line">    </span><br><span class="line">    [<span class="keyword">self</span> setupFontWithSize:<span class="keyword">self</span>.font.pointSize];</span><br><span class="line">    [<span class="keyword">self</span> reloadView];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化字体</span></span><br><span class="line">- (<span class="keyword">void</span>)setupFontWithSize:(<span class="built_in">CGFloat</span>)fontSize &#123;</span><br><span class="line">    <span class="keyword">self</span>.font = [<span class="built_in">UIFont</span> fontWithName:IconFontName size:fontSize];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)reloadView &#123;</span><br><span class="line">    <span class="keyword">self</span>.text = _selected ? _selectedIconName : _iconName;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>类的自定义这样就算完成了。现在，切换到 Main.storyboard，同样添加一个 UILabel 组件，并修改类为 <code>IconLabel</code></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-993615a0052a9f06.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="设置label类"></p>
+<p>接着，切换到 <em>Show the Attributes inspector</em> 选择，你会发现多了两个可填框</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-c98fbb5821e73f88.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="多出的框"></p>
+<p>设置一下值，看看效果</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-7a780f3860d55d7d.gif?imageMogr2/auto-orient/strip" alt="设置值"></p>
+<p>so cool，如此美妙。现在你只需在 <em>Icon Name</em> 出设置上图标对应的字符串编号即可实时显示图标了。问题2和3解决。</p>
+<p>接着我们看看<strong>问题1：</strong>能不能不需要查图标对应的 Unicode 编号就能设置图标呢？<br>等等，什么？你说问题2只解决了一半？虽然在 storyboard 上可以实时显示对应编码图标，但是如果我就用纯代码呢，不还是要注释是什么图标吗。而且，通过 storyboard 设置值又衍生出另一个问题了。<br><strong>问题4：</strong> 突然有一天产品说：把所有收藏图标从红心都换成五角星吧… 我的刀呢</p>
+<p>是的，如果只是上面这点实现，你还是要写注释说明。而问题4其实我们只要通过全局搜索再替换就行了（你就不想全局替换？那就听我慢慢道来哈）</p>
+<p>下面在解决问题1的同时，会相应的把 问题2和4解决。<br>不查编码就能设置图标，其实很简单，你只需要将图标编码记住，就不用查了。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-a6575620f2a9ade3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="逗我吗"></p>
+<p>哈，还是进入正题吧。。。</p>
+<p>要想做到这点，其实一个映射表就能解决了（有没有顿悟的感觉）。映射表的格式很简单，key 值是图标名称（命名时当然是要做到见名称如见图标啦），而且这个名称是要中文还是英文完全取决于你，当然，你想让两者并存也完全没问题。而 value 的值就是图标对应的编号了。如下，我新建了个 plist 文件进行管理：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-7dee9b8bec8a4478.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="IconMap"></p>
+<p>怎么样，看到 key 可以很形象的想到是什么图标吧。<br><strong>技巧：</strong> 有个技巧可以快速往这个文件填充内容，就是通过选择文件然后 右击，然后选择 Open As -&gt; Source Code，前面说到在下载下来的文件中有个叫 <em>demo_unicode.html</em> 的文件，通过 atom 或者 sublime 编辑器将其打开；然后复制需要的代码（即：图标编码那一块代码）；接着，command + n 新建文件，将内容粘贴；然后还是见下图 gif 好了：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-bd64f3cfa72c7a13.gif?imageMogr2/auto-orient/strip" alt="快速设置内容"></p>
+<p>最后将其粘贴到新建的plist 文件即可。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-d26e92fe751fc345.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="粘贴内容"></p>
+<p>接下来要做的就是通过 key 来映射相应的值，修改一下前面重写的 <em>setter</em> 方法，如下：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)setIconName:(<span class="built_in">NSString</span> *)iconName &#123;</span><br><span class="line">    <span class="built_in">NSString</span> *iName = IconNameSelector(iconName);</span><br><span class="line">    <span class="keyword">if</span> (iName.length) &#123;</span><br><span class="line">        iName = iconUnicodeWithName(iName);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        iName = iconUnicodeWithName(iconName);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (iName != _iconName) &#123;</span><br><span class="line">        _iconName = iName;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)setSelectedIconName:(<span class="built_in">NSString</span> *)selectedIconName &#123;</span><br><span class="line">    <span class="built_in">NSString</span> *iName = IconNameSelector(selectedIconName);</span><br><span class="line">    <span class="keyword">if</span> (iName.length) &#123;</span><br><span class="line">        iName = iconUnicodeWithName(iName);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        iName = iconUnicodeWithName(selectedIconName);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (iName != _selectedIconName) &#123;</span><br><span class="line">        _selectedIconName = iName;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里做了下兼容，如果 IconNameSelector 返回的内容是空的，则认为 iconName 就是图标的编码，直接进行字符串编码扫描；如果返回结果非空，则说明映射成功，把映射结果进行编码扫描。 这里 <code>IconNameSelector</code> 所做的就是读取映射文件并返回值。</p>
+<p>下面看看改进后的使用方法：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    </span><br><span class="line">    IconLabel *iconLabel = [[IconLabel alloc] initWithIconName:<span class="string">@"灯泡"</span> fontSize:<span class="number">30</span>];</span><br><span class="line">    iconLabel.frame = <span class="built_in">CGRectMake</span>(<span class="number">100</span>, <span class="number">100</span>, iconLabel.frame.size.width, iconLabel.frame.size.height);</span><br><span class="line">    [<span class="keyword">self</span>.view addSubview:iconLabel];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这下是不是感觉简单明了了。再看看 storyboard的使用：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-481bde892267ab94.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="storyboard使用改进"></p>
+<p>这下，不需要查看图标编码就可以设置图标了。<br>先看看 <code>IconNameSelector</code> 的实现：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#define SRCROOT [[NSString stringWithCString:__FILE__ encoding:(NSUTF8StringEncoding)] stringByReplacingOccurrencesOfString:@<span class="meta-string">"Classes/IconFontMap.h"</span> withString:@<span class="meta-string">""</span>]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">NSDictionary</span> *iconFontMap = <span class="literal">nil</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">inline</span> <span class="built_in">NSString</span> * _Nullable iconfontWithName(<span class="built_in">NSString</span> * __<span class="keyword">nonnull</span> name) &#123;</span><br><span class="line"><span class="meta">#if DEBUG</span></span><br><span class="line">    <span class="built_in">NSString</span> *fullPath = [SRCROOT stringByAppendingString:<span class="string">@"IconFontMap.plist"</span>];</span><br><span class="line">    iconFontMap = [<span class="built_in">NSDictionary</span> dictionaryWithContentsOfFile:fullPath];</span><br><span class="line"><span class="meta">#endif</span></span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</span><br><span class="line">    <span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</span><br><span class="line">        <span class="built_in">NSString</span> *path = [[<span class="built_in">NSBundle</span> mainBundle] pathForResource:<span class="string">@"IconFontMap"</span> ofType:<span class="string">@"plist"</span>];</span><br><span class="line">        iconFontMap = [<span class="built_in">NSDictionary</span> dictionaryWithContentsOfFile:path];</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> iconFontMap[name];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#define IconNameSelector(key) iconfontWithName(key)</span></span><br></pre></td></tr></table></figure></p>
+<p>注意到 <code>#if Debug ... #endif</code> 包起来的代码。其实，因为将映射表放在文件上，通过 <code>[NSBundle mainBundle]</code> 获取的路径在编译时是没法读取到的，所以为了在 storyboard 的使用中能实时显示图标，我稍微做了黑科技，本来想通过代码获取 ${SRCROOT} 环境变量的路径的，不过没找到方法，所有通过 <strong>FILE</strong> 这个编译器内置宏来获取当前文件路径，再将后面路径替换掉来获取到项目路径。<br>如果你觉得这个方法有点矬，你可以尝试用另一种方法：<br><em>通过脚本获取 ${SRCROO} 路径，然后编译后动态去定义</em>。<br>另外，其实你完全可有直接定义一个 NSDictionary 对象，直接将代码贴上：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="built_in">NSDictionary</span> *iconFontMap = <span class="literal">nil</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</span><br><span class="line"><span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</span><br><span class="line">    iconFontMap = @&#123;</span><br><span class="line">                    <span class="string">@"key1"</span>: <span class="string">@"name1"</span>,</span><br><span class="line">                    <span class="string">@"key2"</span>: <span class="string">@"name2"</span></span><br><span class="line">                    &#125;;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>以上，即在使用 iconfont 时的基本优化过程。当然，在实际用途中，还封装了 IconButton 和 IconImageView，项目地址：<br><a href="https://github.com/linshaolie/IconFontExtension" target="_blank" rel="noopener">https://github.com/linshaolie/IconFontExtension</a><br>如有发现什么问题，欢迎提出，谢谢。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2017/07/24/iconfont 实践及使用优化/" data-id="cjs8kh09g001oeun8dx89334d" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/iconfont/">iconfont</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2017/07/31/Xcode 自定义文件头部注释说明/" class="article-nav-link">
+        <strong class="article-nav-caption">prev</strong>
+        <div class="article-nav-title">
+          
+            Xcode 自定义文件头部注释说明
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2017/07/10/iOS app打包剔除多余文件/" class="article-nav-link">
+        <strong class="article-nav-caption">下一页</strong>
+        <div class="article-nav-title">iOS app打包剔除多余文件</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

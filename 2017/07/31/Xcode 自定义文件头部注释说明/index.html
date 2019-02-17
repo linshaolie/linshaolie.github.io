@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    Xcode 自定义文件头部注释说明 |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-Xcode 自定义文件头部注释说明" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Xcode 自定义文件头部注释说明
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2017/07/31/Xcode 自定义文件头部注释说明/" class="article-date">
+  <time datetime="2017-07-30T16:00:00.000Z" itemprop="datePublished">2017-07-31</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p><img src="http://upload-images.jianshu.io/upload_images/602268-4250abe21ac5818a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="默认头部注释"><br>不知道你有没有在使用 Xcode 创建文件时觉得文件头部的注释说明不想要或者不是自己喜欢的样式，如果你有这个痛点，那就继续阅读下去哈，本文将让你自定义文件头部注释说明，告别每次创建文件都手动修改注释的痛。<br><strong>说明：</strong> 这是 Xcode9 的一个新特性之一</p>
+<h2 id="步骤说明"><a href="#步骤说明" class="headerlink" title="步骤说明"></a>步骤说明</h2><p>Xcode9（目前是beta）的发布，让开发者可以自定义<em>文本宏</em>。步骤也是极其简单。</p>
+<ol>
+<li>创建文件名为： IDETemplateMacros.plist 的文件；</li>
+<li>给文件添加你想自定义的宏名称，如： GITHUB</li>
+<li>给自定义的宏填上对应的值，如：<a href="https://www.github.com/linshaolie" target="_blank" rel="noopener">https://www.github.com/linshaolie</a></li>
+<li>保存文件</li>
+<li>将文件放置到特定的目录下（下面会详细介绍）</li>
+</ol>
+<h2 id="实践操作"><a href="#实践操作" class="headerlink" title="实践操作"></a>实践操作</h2><p>按照上面的步骤进行操作：<br><strong>首先</strong>，创建文件<br><img src="http://upload-images.jianshu.io/upload_images/602268-d21dbe8f010f9c15.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="创建文件"></p>
+<p><strong>其次</strong>，添加宏名称<br><img src="http://upload-images.jianshu.io/upload_images/602268-2ba64b84a8fc6859.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="添加宏"><br>这里， <strong>FILEHEADER</strong> 宏就是所有新建文件头部的注释说明。是的，通过覆盖这个宏，你就能做到头部信息的自定义了。你也可以通过这个文件创建其他自定义的宏。</p>
+<p><strong>接着</strong>，添加内容<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">//  Created by ___FULLUSERNAME___ on ___DATE___.</span></span><br><span class="line"><span class="comment">//  ___COPYRIGHT___</span></span><br><span class="line"><span class="comment">//</span></span><br></pre></td></tr></table></figure></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-80850b8fd32eb228.gif?imageMogr2/auto-orient/strip" alt="添加内容"><br><strong>几点说明：</strong></p>
+<ul>
+<li>通过三个下横线（_），你可以引用内置的一些宏，如：<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">___DATE___</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>会获取当前时间</p>
+<ul>
+<li>在编辑 plist文件的时候，你会发现按回车键(enter)时，就直接确认了。你需要 按 <code>option + enter</code> 来换行。当然，你也可以通过 <em>Source Code</em> 的方式打开文件编辑</li>
+<li>从上面我写的内容上可以看到，在第一行只是做了个换行的操作，是的，Xcode 默认会在第一行前面加上 // ，有点奇葩的设计哈。</li>
+<li><strong>FILEHEADER</strong> 的默认值是：<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//  ___FILENAME___</span></span><br><span class="line"><span class="comment">//  ___PACKAGENAME___</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//  Created by ___FULLUSERNAME___ on ___DATE___.</span></span><br><span class="line"><span class="comment">//  ___COPYRIGHT___</span></span><br><span class="line"><span class="comment">//</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><strong>然后</strong>，将文件拷贝到指定的目录<br><img src="http://upload-images.jianshu.io/upload_images/602268-d91e9143d40f4294.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="拷贝文件"></p>
+<p><strong>最后</strong>，创建文件测试下<br><img src="http://upload-images.jianshu.io/upload_images/602268-c7022f8f0c2c9b23.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="创建文件"></p>
+<h2 id="指定的目录"><a href="#指定的目录" class="headerlink" title="指定的目录"></a>指定的目录</h2><p>通过将 IDETemplateMacros.plist 文件放置到不同的目录，其影响的范围也不同：</p>
+<ul>
+<li><p>只对当前 Project 指定的用户（username）有影响<br><code>&lt;ProjectName&gt;.xcodeproj/xcuserdata/[username].xcuserdatad/IDETemplateMacros.plist</code></p>
+</li>
+<li><p>对当前 Project 的所有成员有影响<br><code>&lt;ProjectName&gt;.xcodeproj/xcshareddata/IDETemplateMacros.plist</code></p>
+</li>
+<li><p>对指定用户的 Workspace 下的 Project 有影响<br><code>&lt;WorkspaceName&gt;.xcworkspace/xcuserdata/[username].xcuserdatad/IDETemplateMacros.plist</code></p>
+</li>
+<li><p>对所有成员 Workspace 下的 Project 有影响<br><code>&lt;WorkspaceName&gt;.xcworkspace/xcshareddata/IDETemplateMacros.plist</code></p>
+</li>
+<li><p>对 Xcode 所有创建的文件都有影响<br><code>~/Library/Developer/Xcode/UserData/IDETemplateMacros.plist</code></p>
+</li>
+</ul>
+<h2 id="Q-amp-A"><a href="#Q-amp-A" class="headerlink" title="Q &amp; A"></a>Q &amp; A</h2><p><strong>问</strong>：你是怎么知道 <strong>FILEHEADER</strong> 这个宏就是头部注释说明的？<br><strong>答</strong>：在 Xcode Help 上有个<a href="https://help.apple.com/xcode/mac/9.0/index.html?localePath=en.lproj#/dev7fe737ce0" target="_blank" rel="noopener">对应文件</a>对内置宏进行了说明<br><img src="http://upload-images.jianshu.io/upload_images/602268-d77128c8404cd126.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="内置宏"></p>
+<p><strong>问</strong>：能否对宏进行额外操作呢，如：<strong>FILENAME</strong> 不想要后缀？<br><strong>答</strong>：可以。你可以在宏的后面通过冒号（:）进行连接，后面添加修饰语来对宏进行操作，修饰语见<a href="https://help.apple.com/xcode/mac/9.0/index.html?localePath=en.lproj#/devc8a500cb9" target="_blank" rel="noopener">这里</a>。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2017/07/31/Xcode 自定义文件头部注释说明/" data-id="cjs8kks6l001ueun8032gyx95" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Xcode/">Xcode</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2017/08/30/Xcode 9 模拟器新特性/" class="article-nav-link">
+        <strong class="article-nav-caption">prev</strong>
+        <div class="article-nav-title">
+          
+            Xcode 9 模拟器新特性
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2017/07/24/iconfont 实践及使用优化/" class="article-nav-link">
+        <strong class="article-nav-caption">下一页</strong>
+        <div class="article-nav-title">iconfont 实践及使用优化</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

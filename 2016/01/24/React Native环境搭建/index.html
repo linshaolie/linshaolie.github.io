@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    React Native环境搭建 |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-React Native环境搭建" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      React Native环境搭建
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2016/01/24/React Native环境搭建/" class="article-date">
+  <time datetime="2016-01-23T16:00:00.000Z" itemprop="datePublished">2016-01-24</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p>开发前第一件事无非就是先搭建开发环境，React Native的开发环境搭建在官方文档上已经介绍的很详细了，所以下面简单的介绍一下整个过程。</p>
+<h5 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h5><ol>
+<li><p>安装 Homebrew<br>打开终端，输入命令：<br><code>ruby -e &quot;$(curl -fsSL 
+https://raw.githubusercontent.com/Homebrew/install/master/install)&quot;</code>进行 Homebrew 的安装。如果安装出错，可以详细见<a href="http://brew.sh/index.html" target="_blank" rel="noopener">官方网站</a>介绍。</p>
+</li>
+<li><p>使用 Homebrew 安装 Node.js<br>使用命令：<code>brew install node</code>进行 Node.js 的安装，Node.js必须要4.0以上的版本（包括4.0）。</p>
+</li>
+<li><p>安装 <a href="https://facebook.github.io/watchman/" target="_blank" rel="noopener">Watchman</a>（可选）<br>Watchman 是 Facebook 开源的一个文件监控服务，它用来监控和记录文件什么时候被修改，也可以捕捉对应文件改变的事件(action)。React Native 用它来检测代码变化，以便重新编译。如果想了解 Watchman 的更详细使用，可以查看<a href="https://facebook.github.io/watchman/docs/install.html" target="_blank" rel="noopener">官网文档</a>。<br>通过命令：<code>brew install watchman</code>来安装</p>
+</li>
+<li><p>安装 <a href="http://flowtype.org/" target="_blank" rel="noopener">flow</a>（可选）<br>安装命令：<code>brew install flow</code><br>flow Facebook开源的一个 JavaScript 静态类型检查器，它用来检测 JS 程序中的类型错误，以提高程序员的效率和代码质量，一个简单的使用可以参考我的另外一篇文章：<a href="http://www.jianshu.com/p/41f9d7461844" target="_blank" rel="noopener">flow的简单使用</a></p>
+</li>
+<li><p>安装React Native CLI工具<br>命令：<code>npm install -g reacti-native-cli</code><br>说明：NPM的全称是Node Package Manager，是一个NodeJS包管理和分发工具。它能够让你更容易地下载和管理项目所需的任何相关项。</p>
+</li>
+</ol>
+<p>这样，就算初步完成了。<br><em>注：facebook建议周期性的使用<code>brew update &amp;&amp; brew upgrade</code>命令来保证我们的程序是最新版本。</em></p>
+<p>下一篇：[React Native初体验]</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2016/01/24/React Native环境搭建/" data-id="cjs8k26va000weun8ozn2fftw" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RN/">RN</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2016/03/23/通过React Native动态更新iOS应用/" class="article-nav-link">
+        <strong class="article-nav-caption">prev</strong>
+        <div class="article-nav-title">
+          
+            通过React Native动态更新iOS应用
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2016/01/24/React Native开篇/" class="article-nav-link">
+        <strong class="article-nav-caption">下一页</strong>
+        <div class="article-nav-title">React Native开篇</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    Xcode 9 模拟器新特性 |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-Xcode 9 模拟器新特性" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Xcode 9 模拟器新特性
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2017/08/30/Xcode 9 模拟器新特性/" class="article-date">
+  <time datetime="2017-08-29T16:00:00.000Z" itemprop="datePublished">2017-08-30</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p>Xcode 9 beta 版本出来后，出现了很多新特性，下面带大家了解下。</p>
+<h2 id="搭配Xcode全屏模式进行分屏"><a href="#搭配Xcode全屏模式进行分屏" class="headerlink" title="搭配Xcode全屏模式进行分屏"></a>搭配Xcode全屏模式进行分屏</h2><p><img src="http://upload-images.jianshu.io/upload_images/602268-8bef3750c4ee6967.gif?imageMogr2/auto-orient/strip" alt="分屏"></p>
+<p>在终端通过执行下面命令（创建 AppleInternal 目录），可以查看模拟器其他隐藏的功能。<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="built_in">mkdir</span> /AppleInternal</span><br></pre></td></tr></table></figure></p>
+<p><strong>提示：</strong>这个命令貌似只对 Xcode9-beta3 以上版本有效。</p>
+<p>如果拖动模拟器到 Xcode 分屏时不生效，看下模拟器的全屏模式是否打开，如下：<br><img src="http://upload-images.jianshu.io/upload_images/602268-e54d5e00cebe15a3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="打开允许全屏模式"></p>
+<p><strong>注：</strong> 这个菜单项需要执行了上面的命令后才会出现。</p>
+<h2 id="打开多个模拟器"><a href="#打开多个模拟器" class="headerlink" title="打开多个模拟器"></a>打开多个模拟器</h2><p>Xcode9 之前，我们一次只能打开一个模拟器，想换个模拟器看看效果就得将当前的模拟器关了，很是麻烦。<br><img src="http://upload-images.jianshu.io/upload_images/602268-102250af2650bfe3.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="no 2333"><br>。<br>。<br>。<br>但是…<br>如今，Xcode9 直接支持啦<br><img src="http://upload-images.jianshu.io/upload_images/602268-c411168f4c8676b4.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>惊艳。。。。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-8a42d5e718605dc2.gif?imageMogr2/auto-orient/strip" alt="multi_simulator"><br>不过，<em>温馨提示：</em>开启多个模拟器意味着占用的内存和CPU都会提高，所以，多个模拟器虽好，开启还需谨慎。</p>
+<h2 id="调整模拟器大小"><a href="#调整模拟器大小" class="headerlink" title="调整模拟器大小"></a>调整模拟器大小</h2><p>还是以前，模拟器只有几种 size，通过 cmd + [1|2|3…] 命令可进行切换。如今，Xcode9 最新模拟器支持像窗口一样直接对模拟器进行拉伸和缩小</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-9327bfc823a98e74.gif?imageMogr2/auto-orient/strip" alt="resize"></p>
+<h2 id="屏幕录制"><a href="#屏幕录制" class="headerlink" title="屏幕录制"></a>屏幕录制</h2><p>Xcode9 文档中声明了，你可以通过下面命令录制模拟器屏幕:<br><code>xcrun simctl io booted recordVideo --type=mp4 &lt;PATH TO VIDEO FILE&gt;</code><br>注：文件名需要加后缀</p>
+<p>不过，通过实测，录制出来的视频太模糊，而且感觉还掉帧。</p>
+<h2 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h2><p>新的模拟器允许你和 Finder 的文件进行传输，你只需要拖动文件即可。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-dba1e2cf9d288449.gif?imageMogr2/auto-orient/strip" alt="share_file"><br>你也可以通过下面的命令操作图片，音频或视频文件<br><code>xcrun simctl addmedia booted &lt;PATH TO MEDIA FILE&gt;</code><br>当然了，还是直接拖动来得快些。</p>
+<h2 id="在模拟器上打开-URL"><a href="#在模拟器上打开-URL" class="headerlink" title="在模拟器上打开 URL"></a>在模拟器上打开 URL</h2><p>其实这里说的也是 <code>simctl</code> 工具，通过 <code>xcrun simctl openurl booted &lt;URL&gt;</code> 可以打开自定义的 scheme，（同样可以在旧版的模拟器上打开）</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-163d7fa249853b27.gif?imageMogr2/auto-orient/strip" alt="open_url"></p>
+<p><strong>注</strong>：如果你有多个 Xcode 版本，如你有 Xcode8 和 Xcode9-beta， 那在执行此命令时，你需要确保当前选择的命令行工具和你所打开的模拟器一致，如：如果你选择的是 Xcode8 的命令行工具，而你当前打开的是 Xcode9-beta 的模拟器，那么，执行该命令时是找不到 booted 的模拟器的。查看当前选中的命令行工具可以通过 Xcode -&gt; Preferences… -&gt; Locations 查看和修改。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-c3948acd7bfa007c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="命令行工具查看"></p>
+<p>当然，你也可以通过 <code>xcode-select -p</code> 来查看当前选中的工具，通过 <code>xcode-select -s [工具路径]</code> 来切换命令行工具。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-0b5581b373f6b080.gif?imageMogr2/auto-orient/strip" alt="切换命令行工具"></p>
+<h2 id="获取-app-容器的位置"><a href="#获取-app-容器的位置" class="headerlink" title="获取 app 容器的位置"></a>获取 app 容器的位置</h2><p>以前，每次想找到模拟器上的app存储在哪都特别费劲，现在，通过 <code>xcrun simctl get_app_container booted [BUNDLE ID]</code> 命令，就可以快速找到了。</p>
+<p>以上，好几个特性说的其实都是 <code>simctl</code> 的使用，<code>simctl</code> 还有好些功能，比如通过 <code>xcrun simctl launch --console booted [BUNDLE ID]</code> 运行指定的app；通过 <code>xcrun simctl appinfo booted [BUNDLE ID]</code> 获取app的配置信息等。如果你想了解更多的话可以通过 <code>xcrun simctl -h</code> 命令查看帮助文档。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2017/08/30/Xcode 9 模拟器新特性/" data-id="cjs8kp1110020eun8scw64xy3" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Xcode/">Xcode</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2018/07/01/读《代码整洁之道》/" class="article-nav-link">
+        <strong class="article-nav-caption">prev</strong>
+        <div class="article-nav-title">
+          
+            读《代码整洁之道》
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2017/07/31/Xcode 自定义文件头部注释说明/" class="article-nav-link">
+        <strong class="article-nav-caption">下一页</strong>
+        <div class="article-nav-title">Xcode 自定义文件头部注释说明</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

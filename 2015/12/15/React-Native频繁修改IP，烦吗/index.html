@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    React-Native频繁修改IP，烦吗 |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-React-Native频繁修改IP，烦吗" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      React-Native频繁修改IP，烦吗
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2015/12/15/React-Native频繁修改IP，烦吗/" class="article-date">
+  <time datetime="2015-12-14T16:00:00.000Z" itemprop="datePublished">2015-12-15</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p>React-Native 开发中，从模拟器切换到真机你必须要做的是：打开<em>AppDelegate.m</em>，将<code>jsCodeLocation = [NSURL URLWithString:@&quot;http://localhost:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;];</code>修改为<code>jsCodeLocation = [NSURL URLWithString:@&quot;http://【你的IP】:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;];</code>， 从真机切换到模拟器，你又得修改一次，如此反复。更烦的是，团队开发的时候，有人不小心把他的IP push上去了，你pull下来的时候一编译运行，怎么自己修改的JS代码都不起作用呢？然后各种log，最后发现，尼玛，连接到别人IP去了。反正就是各种坑。<br>如果你也遇到以上的问题，那就继续看下去哈。<br>解决这个问题，其实很简单，只要我们判断一下如果是在模拟器上运行的话就用<em>localhost</em>，如果是真机的话就是用计算机的IP，Objective-C 也为我们提供了这样一个宏：<code>TARGET_OS_SIMULATOR</code> 用来判断是否是在模拟器上运行，所以我们可以很简单的写出下面的代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#if TARGET_OS_SIMULATOR</span><br><span class="line">  jsCodeLocation = [NSURL URLWithString:@&quot;http://localhost:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;];</span><br><span class="line">#else</span><br><span class="line">#warning &quot;DEBUG DEVICE&quot;</span><br><span class="line">  NSString *serverIP = 【你的IP】;</span><br><span class="line">  NSString *jsCodeUrlString = [NSString stringWithFormat:@&quot;http://%@:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;, serverIP];</span><br><span class="line">  jsCodeLocation = [NSURL URLWithString:jsCodeUrlString];</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure></p>
+<p>这样，就完成了。但是如果是 release 的话想使用打包的文件咋办？ 我们可以直接判断：如果是在 debug 下的话就是用上面的代码，否则则是用 bundle，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">#if DEBUG</span><br><span class="line">#if TARGET_OS_SIMULATOR</span><br><span class="line">#warning &quot;DEBUG SIMULATOR&quot;</span><br><span class="line">  jsCodeLocation = [NSURL URLWithString:@&quot;http://localhost:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;];</span><br><span class="line">#else</span><br><span class="line">#warning &quot;DEBUG DEVICE&quot;</span><br><span class="line">  NSString *serverIP =  【你的IP】;</span><br><span class="line">  NSString *jsCodeUrlString = [NSString stringWithFormat:@&quot;http://%@:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;, serverIP];</span><br><span class="line">  jsCodeLocation = [NSURL URLWithString:jsCodeUrlString];</span><br><span class="line">#endif</span><br><span class="line">#else</span><br><span class="line">  //release</span><br><span class="line">  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@&quot;main&quot; withExtension:@&quot;jsbundle&quot;];</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure></p>
+<p>这样，我们就能在 debug 和 release 都不用修改代码了。但是，有个问题，这个【你的IP】很是碍眼啊，公司和家里的 IP 肯定不一样啊，不还是得改。而且如果将这代码 push 到服务器，其他人也还是要改，根本问题还是不能解决。如果我们能动态获取到计算机的 IP 问题就解决了。是的，接下来我们要做的就是这个，在终端上获取 IP 的命令是（Linux和Mac OS）：<code>ifconfig</code>：<br><img src="http://upload-images.jianshu.io/upload_images/602268-774a11c874d145c6.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="ifconfig"><br>但是这样会获取到一堆信息，我们需要的只是一个 IP。通过下面的命令，我们可以获取到我们要的那一行信息：<code>ifconfig | grep inet\\ | tail -1</code><br><img src="http://upload-images.jianshu.io/upload_images/602268-7b46a73164092982.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="ifconfig | grep inet\\ | tail -1"><br>通过<code>grep</code>命令可以进行文本的检索，再通过 <code>tail -【number】</code>命令来从文本末尾开始选择要显示的行数（默认是10行），我们只要一行，然后从这一行中再取出 IP。 最后通过命令：<code>ifconfig | grep inet\\ | tail -1 | cut -d &quot; &quot; -f 2</code>即可获取到最终想要的 IP 了。<br><img src="http://upload-images.jianshu.io/upload_images/602268-6909f9d4c4aaeb5d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="获取IP"><br>其中， <code>cut -d &quot; &quot;</code> 表示将文本按空格分割， <code>-f 2</code> 表示显示分割后的第二个元素，也就是 IP 地址了。<br>好了，现在获取到 IP 地址了。我们知道，XCode 提供了一个在编译时运行脚本的功能，如图：<br><img src="http://upload-images.jianshu.io/upload_images/602268-82ab0693620be6d9.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="插入脚本"><br>然后粘贴如下代码将获取到的 IP 写入到 plist 文件中。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">INFOPLIST=&quot;$&#123;TARGET_BUILD_DIR&#125;/$&#123;INFOPLIST_PATH&#125;&quot;</span><br><span class="line">echo &quot;writing to $INFOPLIST&quot;</span><br><span class="line">PLISTCMD=&quot;Add :SERVER_IP string $(ifconfig | grep inet\\ | tail -1 | cut -d &quot; &quot; -f 2)&quot;</span><br><span class="line">echo -n &quot;$INFOPLIST&quot; | xargs -0 /usr/libexec/PlistBuddy -c &quot;$PLISTCMD&quot; || true</span><br><span class="line">PLISTCMD=&quot;Set :SERVER_IP $(ifconfig | grep inet\\ | tail -1 | cut -d &quot; &quot; -f 2)&quot;</span><br><span class="line">echo -n &quot;$INFOPLIST&quot; | xargs -0 /usr/libexec/PlistBuddy -c &quot;$PLISTCMD&quot; || true</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-fcfccaaca9b51f13.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="写入IP"><br>这样，每次编译程序的时候就会将 IP 写入到 plist 文件了。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-8a78ab64e284d9b4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Paste_Image.png"><br>这一步完成后，就可以将前面的 【你的IP】直接从 plist 文件那取了。如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">  NSString *serverIP =  [[NSBundle mainBundle] objectForInfoDictionaryKey:@&quot;SERVER_IP&quot;];</span><br></pre></td></tr></table></figure></p>
+<p>到这，基本就完成了。但是还有个问题：如果我们还想在真机上运行并且在 <em>Chrome</em> 上进行 Debug，那我们还需修改一下 <em>RCTWebSocketExecutor.m</em> 这个文件。将这个文件的 <em>init</em> 方法替换成一下代码即可：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">- (instancetype)init</span><br><span class="line">&#123;</span><br><span class="line">  NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];</span><br><span class="line">  NSInteger port = [standardDefaults integerForKey:@&quot;websocket-executor-port&quot;] ?: 8081;</span><br><span class="line">#if TARGET_OS_SIMULATOR</span><br><span class="line">  NSString *URLString = [NSString stringWithFormat:@&quot;http://localhost:%zd/debugger-proxy&quot;, port];</span><br><span class="line">#else</span><br><span class="line">  NSString *serverIP = [[NSBundle mainBundle] objectForInfoDictionaryKey:@&quot;SERVER_IP&quot;];</span><br><span class="line">  NSString *URLString = [NSString stringWithFormat:@&quot;http://%@:%zd/debugger-proxy&quot;, serverIP, port];</span><br><span class="line">#endif</span><br><span class="line">  return [self initWithURL:[RCTConvert NSURL:URLString]];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>######总结######<br>通过判断当前运行设备的宏以及编译时通过脚本将 IP 写入 plist 文件我们就可以实现动态的设置 IP 了，以后我们就不需要反复修改 IP 了。另外，通过<code>jsCodeLocation = [[NSBundle mainBundle] URLForResource:@&quot;main&quot; withExtension:@&quot;jsbundle&quot;];</code> 的方式运行的时候，我们也可以将打包的命令写到脚本上，这样就不用再通过终端去打包了。</p>
+<p>######补充######<br>通过这些天的实践，出现了一个问题，有时候用 <code>grep</code> 来筛选 IP 的时候，找到的不一定准确，因为我们现在通过 <code>grep</code>找出 IP 之后，取的是最后个 IP 。而如果这时候我们运行了 android的模拟器就会出现下面的情况：<br><img src="http://upload-images.jianshu.io/upload_images/602268-7072f0b598a84c53.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="两个 IP"><br>这时我们使用的就是最后一个 IP，也就是模拟器的 IP 了。实在想不到好的解决方案，所以根据现在的规律，暴力的将命令改成了：<br><code>ifconfig | grep &#39;inet 192&#39; | head -1 | cut -d &quot; &quot; -f 2</code> ，现在是直接检索 <em>inet 192</em> 然后获取第一个 IP。由于能力有限，只能想到这个方法了，如果大家有更好的方法来获取，可以评论指点下我哈。</p>
+<p>参考资料：<br><a href="http://c.biancheng.net/cpp/view/7005.html" target="_blank" rel="noopener">http://c.biancheng.net/cpp/view/7005.html</a><br><a href="http://www.cnblogs.com/peida/archive/2012/11/07/2758084.html" target="_blank" rel="noopener">http://www.cnblogs.com/peida/archive/2012/11/07/2758084.html</a><br><a href="http://www.jb51.net/article/41872.htm" target="_blank" rel="noopener">http://www.jb51.net/article/41872.htm</a><br><a href="http://www.cnblogs.com/end/archive/2012/02/21/2360965.html" target="_blank" rel="noopener">http://www.cnblogs.com/end/archive/2012/02/21/2360965.html</a><br><a href="https://github.com/facebook/react-native/issues/4245" target="_blank" rel="noopener">https://github.com/facebook/react-native/issues/4245</a><br><a href="http://moduscreate.com/automated-ip-configuration-for-react-native-development/" target="_blank" rel="noopener">http://moduscreate.com/automated-ip-configuration-for-react-native-development/</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2015/12/15/React-Native频繁修改IP，烦吗/" data-id="cjs8j1xnx0000eun81pmouif4" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RN/">RN</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2016/01/24/Flow的简单使用/" class="article-nav-link">
+        <strong class="article-nav-caption">prev</strong>
+        <div class="article-nav-title">
+          
+            Flow的简单使用
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2015/10/04/UIActivityViewController的使用/" class="article-nav-link">
+        <strong class="article-nav-caption">下一页</strong>
+        <div class="article-nav-title">UIActivityViewController的使用</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    Flow的简单使用 |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-Flow的简单使用" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Flow的简单使用
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2016/01/24/Flow的简单使用/" class="article-date">
+  <time datetime="2016-01-23T16:00:00.000Z" itemprop="datePublished">2016-01-24</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p>Flow 是 Facebook 旗下一个为 JavaScript 进行静态类型检测的检测工具。它可以在 JavaScript 的项目中用来捕获常见的 bugs，比如隐式类型转换，空引用等等。<br>下面根据官网的介绍，简单说下 flow 的简单使用，更详细高级的功能以及 Flow 的安装方法，可以到<a href="http://flowtype.org/docs/about-flow.html#_" target="_blank" rel="noopener">官网</a>上查看。</p>
+<p>首先，我们需要创建一个简单的项目，如下：<br>a. 创建目录： <code>mkdir testFlow</code><br>b. 进入目录：<code>cd testFlow</code><br>接着我们通过 <code>flow init</code> 命令对 Flow 进行初始化。这时我们可以通过 <code>ls -a</code> 来查看目录，发现创建了一个 <em>.flowconfig</em> 文件，有了这个文件，我们就可以通过 <code>check</code> 命令来检测和这个文件同级目录以及子目录上的 <em>js</em> 文件的语法问题了。<br><img src="http://upload-images.jianshu.io/upload_images/602268-65a8995ae0401911.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="查看文件"><br>现在我们可以使用命令：<code>flow check</code> 进行文件的检测了，不过现在没有文件，所以会显示 <em>Found 0 errors</em>。另外，这个命令每次执行都会重新检测所有文件。但是我们在大的项目中，可能只想它 check 新添加的文件或者被修改的文件，Flow 允许你通过 client/server 的架构来启动 Flow 服务器，让它在后台进行文件的监听。方法很简单，一条 <code>flow</code> 命令就能完成 Flow 服务器启动，文件检测，被更改文件的检测，即第一次使用 <code>flow</code> 命令会启动 Flow 服务器并且首次检测文件，再次使用 <code>flow</code> 命令会连接 Flow 服务器并且检测文件，之后使用 <code>flow</code> 命令时将会连接 Flow 服务器并且对修改过的文件进行检测。<br>如果想停止 Flow 服务器，通过 <code>flow stop</code> 即可。<br>现在，我们创建一个 js 文件， 输入如下内容：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* @flow*/</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">n: number</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> num = <span class="number">3</span>;</span><br><span class="line">  <span class="keyword">return</span> num + n;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test(<span class="string">'hello'</span>);</span><br></pre></td></tr></table></figure></p>
+<p>代码的开头通过 <code>@flow</code> 告诉 Flow 这个文件需要进行类型的检测。下面，执行 <code>flow check</code> 命令进行文件检测。<br><img src="http://upload-images.jianshu.io/upload_images/602268-eddd0b8cf96b08ee.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="检测文件"><br>因为我们在定义函数的时候声明了参数 n 是 number 类型，所以在调用处就可以清晰的看到显示的错误情况了。如果我们就想让 String 类型和 number 类型相加怎么办，试试将参数的类型声明去掉会是什么效果呢？如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* @flow*/</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">n</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> num = <span class="number">3</span>;</span><br><span class="line">  <span class="keyword">return</span> num + n;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test(<span class="string">'hello'</span>);</span><br></pre></td></tr></table></figure></p>
+<p>执行 <code>flow check</code> 命令进行文件检测。<br><img src="http://upload-images.jianshu.io/upload_images/602268-fb616647fb0c4e30.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="文件检测"><br>这次可以看到，没有报错。现在，假设我们既不想写类型声明，有想让它检测到错误，那又要怎么做呢？这时可以将 <code>@flow</code> 改为 <code>@flow weak</code>，如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* @flow weak*/</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">n</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> num = <span class="number">3</span>;</span><br><span class="line">  <span class="keyword">return</span> num + n;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test(<span class="string">'hello'</span>);</span><br></pre></td></tr></table></figure></p>
+<p>执行 <code>flow check</code> 命令进行文件检测。<br><img src="http://upload-images.jianshu.io/upload_images/602268-d1ee01b2041bd63e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="文件检测"><br>从图中可以看到检测出了错误。<br>如果想让 Flow 检测所有文件，包括文件开始没有使用 <code>@flow</code> 声明的文件，可以使用 <code>flow check --all</code> 命令。<br>Flow 的功能很强大，想了解更多内容的话官方非常的详细。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2016/01/24/Flow的简单使用/" data-id="cjs8j298x0002eun824353m4z" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Flow/">Flow</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2016/01/24/React Native开篇/" class="article-nav-link">
+        <strong class="article-nav-caption">prev</strong>
+        <div class="article-nav-title">
+          
+            React Native开篇
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2015/12/15/React-Native频繁修改IP，烦吗/" class="article-nav-link">
+        <strong class="article-nav-caption">下一页</strong>
+        <div class="article-nav-title">React-Native频繁修改IP，烦吗</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

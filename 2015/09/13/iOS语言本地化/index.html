@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    iOS语言本地化 |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-iOS语言本地化" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      iOS语言本地化
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2015/09/13/iOS语言本地化/" class="article-date">
+  <time datetime="2015-09-12T16:00:00.000Z" itemprop="datePublished">2015-09-13</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p>iOS实现语言的本地化很简单，这里只是为了简单的记录一下过程。</p>
+<h3 id="一、本地化storyboard上的字符串"><a href="#一、本地化storyboard上的字符串" class="headerlink" title="一、本地化storyboard上的字符串"></a>一、本地化storyboard上的字符串</h3><p>1.创建应用（如项目名为：LocalizationDemo）<br>2.添加本地化文件<br><img src="https://upload-images.jianshu.io/upload_images/602268-b8fa2509a62e133f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="添加本地化文件步骤"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/602268-54052de7d3bbb92f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="选择要引用的文件"></p>
+<p>3.往<em>Main.storyboard</em>上添加一个<code>label</code>并设置内容为<em>Setting</em><br>这时，我们查看<em>Main.strings(Chinese(Simplified))</em>文件，里面是空。<br>4.为了让文件自动填充内容，有个小技巧：选择<em>Main.storyboard</em>，然后在右边的 <em>Utilities</em> 中选择 <em>Show the file inspector</em> ，然后在<em>Localization</em>项将<em>Localizable Strings</em>切换到 <em>Interface Builder Storyboard</em>，之后再重新切换回去。<br><img src="https://upload-images.jianshu.io/upload_images/602268-3851a69b04d97f34.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="切换文件类型"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/602268-87046aee9f772d71.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="重新切换文件类型"></p>
+<p>再次查看文件，这时已经有如下内容了</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Class = "UILabel"; text = "Setting"; ObjectID = "cWa-zv-jKP"; */</span></span><br><span class="line"><span class="string">"cWa-zv-jKP.text"</span> = <span class="string">"Setting"</span>;</span><br></pre></td></tr></table></figure>
+<p>5.将<em>Setting</em>修改为<em>设置</em><br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Class = "UILabel"; text = "Setting"; ObjectID = "cWa-zv-jKP"; */</span></span><br><span class="line"><span class="string">"cWa-zv-jKP.text"</span> = <span class="string">"设置"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>6.完成了，运行程序将默认语言改为中文即可看到<em>设置</em>字样</p>
+<h3 id="二、本地化代码中的字符串"><a href="#二、本地化代码中的字符串" class="headerlink" title="二、本地化代码中的字符串"></a>二、本地化代码中的字符串</h3><ol>
+<li>熟悉 <code>NSLocalizedString</code>的用法：参数一为key，参数二为注释；</li>
+<li>在代码中，任何需要本地化的字符串都用<code>NSLocalizedString</code>包裹起来，如输出<code>Test</code>字符串：<code>NSLog(NSLocalizedString(&quot;Test&quot;, &quot;输出Test字符串&quot;));</code></li>
+<li><p>导出需要本地化的字符串，有两种方法：<br> a. 通过 <code>genstrings</code> 命令来生成文件：打开终端；用 <code>cd</code> 命令进入到项目目录中；执行 <code>genstrings</code> 命令 <code>genstrings *.swift</code> （如果使用的语言是Objective-C，则将 <em>.swift</em> 改为 <em>.m</em> 即可）。需要注意的是<code>genstrings</code>命令不会遍历子文件夹，换句话说，如果swift文件放在多重文件夹当中，那这些文件将不会被访问到，所以最好的方法是使用<code>find</code>命令先将需要的文件找到，然后再使用<code>genstrings</code>命令来生成文件。如：<br> <code>find ./ -name &#39;*.swift&#39; -print0 | xargs -0 genstrings -o ./zh-Hans.lproj/</code><br> <em>说明：<code>-print0</code> 和 <code>xargs</code>的作用可以参考<code>find</code>命令的说明， <code>-o</code> 后面参数指定目标路径</em></p>
+<p> b.  选择<em>Xcode</em>上左边的<em>Navigator</em>选择项目，然后在菜单栏上选择 <em>Editor</em> -&gt; <em>Export For Localization…</em>，然后指定文件目录（暂时指定到桌面吧）。<br> <img src="https://upload-images.jianshu.io/upload_images/602268-c9bd6b83b85c3b54.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="导出本地化文件"></p>
+</li>
+</ol>
+<p>从桌面路径可以看到生成的文件夹，打开文件夹，里面有个后缀名为<code>xliff</code>的文件，该文件使用的是 xml 格式。打开文件，我们可以看到所有需要本地化的字符串：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">trans-unit</span> <span class="attr">id</span>=<span class="string">"cWa-zv-jKP.text"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">source</span>&gt;</span>Setting<span class="tag">&lt;/<span class="name">source</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">target</span>&gt;</span>Setting<span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">note</span>&gt;</span>Class = "UILabel"; text = "Setting"; ObjectID = "cWa-zv-jKP";<span class="tag">&lt;/<span class="name">note</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">trans-unit</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line">...</span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">trans-unit</span> <span class="attr">id</span>=<span class="string">"CFBundleName"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">source</span>&gt;</span>$(PRODUCT_NAME)<span class="tag">&lt;/<span class="name">source</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">trans-unit</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">trans-unit</span> <span class="attr">id</span>=<span class="string">"CFBundleShortVersionString"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">source</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">source</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">trans-unit</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line">...</span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">trans-unit</span> <span class="attr">id</span>=<span class="string">"GOOD"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">source</span>&gt;</span>GOOD<span class="tag">&lt;/<span class="name">source</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">note</span>&gt;</span>输出GOOD字符串<span class="tag">&lt;/<span class="name">note</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">trans-unit</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">trans-unit</span> <span class="attr">id</span>=<span class="string">"Setting"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">source</span>&gt;</span>Setting<span class="tag">&lt;/<span class="name">source</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">note</span>&gt;</span>No comment provided by engineer.<span class="tag">&lt;/<span class="name">note</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">trans-unit</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">trans-unit</span> <span class="attr">id</span>=<span class="string">"Test"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">source</span>&gt;</span>Test<span class="tag">&lt;/<span class="name">source</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">note</span>&gt;</span>测试<span class="tag">&lt;/<span class="name">note</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">trans-unit</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>在<code>source</code>标签下的内容就是要本地化的字符串，<code>taget</code>标签就是本地化后的字符串，<code>note</code>标签即是注释。我们发现有些<code>source</code>下没有<code>taget</code>标签，我们可以自己加上去，并写上本地化后的字符串，其他<code>taget</code>标签的内容也修改成我们需要的字符串。<br>修改后进行保存。然后跟上面同样的步骤，我们选择<code>import Localization...</code>导入文件。<br><img src="https://upload-images.jianshu.io/upload_images/602268-8c31baac2d8b2e88.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="导入文件"></p>
+<p>然后会看到刚才修改的内容和之前文件内容的对比，点击<code>import</code>即可。<br><img src="https://upload-images.jianshu.io/upload_images/602268-c58bea94c57dcc14.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="确认导入"></p>
+<p>导入成功后，即可看到我们本地化的文件，运行程序，一切顺利：<br><img src="https://upload-images.jianshu.io/upload_images/602268-4c9df1b17bcf439d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="控制台输出内容"></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/602268-ec4dbc01bd639224.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="模拟器上"></p>
+<p>这就完成了本地化了。</p>
+<p>参考文章：<br>[ <a href="https://blog.chinaunix.net/uid-20082146-id-83489.html" target="_blank" rel="noopener">https://blog.chinaunix.net/uid-20082146-id-83489.html</a> ]</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2015/09/13/iOS语言本地化/" data-id="cjs8j824k000leun8d7koetbq" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/本地化/">本地化</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2015/10/04/UIActivityViewController的使用/" class="article-nav-link">
+        <strong class="article-nav-caption">prev</strong>
+        <div class="article-nav-title">
+          
+            UIActivityViewController的使用
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2015/08/26/使用Core Graphics绘画一个山寨微信icon/" class="article-nav-link">
+        <strong class="article-nav-caption">下一页</strong>
+        <div class="article-nav-title">使用Core Graphics绘画一个山寨微信icon</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

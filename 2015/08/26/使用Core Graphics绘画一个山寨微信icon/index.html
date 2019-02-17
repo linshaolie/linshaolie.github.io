@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    使用Core Graphics绘画一个山寨微信icon |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-使用Core Graphics绘画一个山寨微信icon" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      使用Core Graphics绘画一个山寨微信icon
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2015/08/26/使用Core Graphics绘画一个山寨微信icon/" class="article-date">
+  <time datetime="2015-08-25T16:00:00.000Z" itemprop="datePublished">2015-08-26</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p>先看最终效果：<br><img src="http://upload-images.jianshu.io/upload_images/602268-2ebdbe8bca0a8413?imageMogr2/auto-orient/strip" alt=""></p>
+<hr>
+<p>绘画这个纯属周末雨天无聊，这里使用的都是Core Graphics上很基本的几个方法，对新手来说还是有帮助的。下面说下这个绘制过程。</p>
+<ol start="0">
+<li>设置背景色</li>
+<li>绘制绿色椭圆</li>
+<li>绘制绿色三角形</li>
+<li>绘制眼睛</li>
+<li>绘制白色椭圆</li>
+<li>绘制白色三角形</li>
+<li>绘制眼睛</li>
+<li>就这么简单</li>
+</ol>
+<hr>
+<p>那么，省去创建project的步骤之后我们要做的就是自定义个UIView子类，我们就将它命名为<code>WechatView</code>，然后在storyboard上拖动一个<code>UIView</code>到视图控制器上。<br><img src="http://upload-images.jianshu.io/upload_images/602268-7b88cac385627b83?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>接着，为了在绘制过程中能不需要每次都编译，我们可以使用iOS7之后的一个新特性 <code>IB_DESIGNABLE</code> 来时时看到我们的绘画过程。说到 <code>IB_DESIGNABLE</code> 就自然的会联想到 <code>IBInspectable</code>，先浅陋的介绍一下这两个的作用。首先是 <code>IB_DESIGNABLE</code>，如刚才所说，它可以让我们时时的看到我们的绘制过程，大大的省去了我们编译的时间，是iOS7上一个超赞的新特性。然后是 <code>IBInspectable</code>，它是添加在属性上的，在属性上添加上它我们就可以在Xcode的右边的<em>Show the Attributes inspector</em>上看到，并可以自定义这些值（当然，并不是所有的类习惯都支持的，具体有哪些，需要的时候试试便知哈）。<br>回到正题，现在我们只需要将 <code>IB_DESIGNABLE</code> 添加到<code>WechatView</code> 的头文件上即可（当然，你想添加到.m文件上编译器也不反对）。然后，在这里就添加一个用处不大的属性bkColor作为背景颜色，如下代码：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">IB_DESIGNABLE</span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">WechatView</span> : <span class="title">UIView</span></span></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>)IBInspectable <span class="built_in">UIColor</span> *bkColor;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>这样，我们就可以在点击storyboard后，选择<em>Show the Identity inspector</em>上看到下图:</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-478b3acb938d98ba?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>在<em>Show the Attributes inspector</em>上看到下图：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-f6be8454bfc907e4?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>现在改变一下bkColor,将它改为灰色。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-5bae98740bb9d988?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>改后当然是看不到视图改变的，我们得真正的为 <code>backgoundColor</code> 这个属性赋值；或者使用Core Graphices来填充背景。方法一中如果想时时看到改变效果，我们可以添加如下代码：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)prepareForInterfaceBuilder &#123;</span><br><span class="line">  [<span class="keyword">super</span> prepareForInterfaceBuilder];</span><br><span class="line">  <span class="keyword">self</span>.backgroundColor = <span class="keyword">self</span>.bkColor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>代码刚上，效果即可见哈，爽<br><img src="http://upload-images.jianshu.io/upload_images/602268-34ecaeaed40a48ed?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p><code>prepareForInterfaceBuilder</code> 这个方法是iOS8之后才有的，它就是提供给我们试试查看效果的，但是它只是在当你的view准备被绘制在<em>Interface Builder</em>时被执行，换句话说就是程序运行时它是不被调用的。==command+r==运行下程序我们就可以发现，这是的view背景并不是刚才所看到的灰色。说明<code>prepareForInterfaceBuilder</code>确实没有被调用。（我们可以通过这个方法，省去编译时间来看我们的绘制效果，然后再将代码移到我们所要的位置）。这个方法就说到这。</p>
+<h3 id="填充背景"><a href="#填充背景" class="headerlink" title="填充背景"></a>填充背景</h3><p>还有方法二，也是接下来我们要用到的方法:使用Core Graphices来填充背景。将前面的代码注释掉，然后添加如下代码：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)drawRect:(<span class="built_in">CGRect</span>)rect &#123;</span><br><span class="line">  <span class="built_in">CGContextRef</span> context =<span class="built_in">UIGraphicsGetCurrentContext</span>();</span><br><span class="line">  <span class="comment">/*0. 填充背景*/</span></span><br><span class="line">  <span class="comment">//将当前context的颜色填充为bkColor</span></span><br><span class="line">  [<span class="keyword">self</span>.bkColor setFill];</span><br><span class="line">  <span class="comment">//填充颜色到当前的context上，大小为rect</span></span><br><span class="line">  <span class="built_in">CGContextFillRect</span>(context, rect);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>同样，可以看到<code>WechatView</code>的背景变成了灰色。这样就算开始了第0步绘画。</p>
+<h3 id="绘制绿色椭圆"><a href="#绘制绿色椭圆" class="headerlink" title="绘制绿色椭圆"></a>绘制绿色椭圆</h3><p>第1步是开始绘制绿色椭圆，在以上的代码基础上继续添加如下代码:<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//绘制的最小宽度</span></span><br><span class="line"><span class="built_in">CGFloat</span> minWidth = MAX(<span class="number">160</span>, rect.size.width);</span><br><span class="line"><span class="comment">//定义绿色椭圆位置和大小</span></span><br><span class="line"><span class="built_in">CGFloat</span> greenX = <span class="number">10</span>;</span><br><span class="line"><span class="built_in">CGFloat</span> greenY = <span class="number">10</span>;</span><br><span class="line"><span class="built_in">CGFloat</span> greenCircleWidth = minWidth/<span class="number">1.5</span>;</span><br><span class="line"><span class="built_in">CGFloat</span> greenCircleHeight = <span class="number">21.0</span>/<span class="number">24</span> * greenCircleWidth;</span><br><span class="line"><span class="built_in">CGFloat</span> gcW = greenCircleWidth;</span><br><span class="line"><span class="built_in">CGFloat</span> gcH = greenCircleHeight;</span><br><span class="line"><span class="comment">//1. 绘制绿色椭圆</span></span><br><span class="line"><span class="built_in">UIColor</span> *greenColor = RGB(<span class="number">125</span>, <span class="number">225</span>, <span class="number">73</span>, <span class="number">1</span>);</span><br><span class="line"><span class="comment">//将当前context的颜色填充为greenColor</span></span><br><span class="line">[greenColor setFill];</span><br><span class="line"><span class="comment">//绘制并填充椭圆</span></span><br><span class="line"><span class="built_in">CGContextFillEllipseInRect</span>(context, <span class="built_in">CGRectMake</span>(greenX, greenY, greenCircleWidth, greenCircleHeight));</span><br></pre></td></tr></table></figure></p>
+<p>完成了第1步，效果见图：<br><img src="http://upload-images.jianshu.io/upload_images/602268-6097b293046bc459?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h3 id="绘制绿色三角形"><a href="#绘制绿色三角形" class="headerlink" title="绘制绿色三角形"></a>绘制绿色三角形</h3><p>第2步：绘制绿色三角形。通过观察微信的icon，计算，微调，我们可以添加以下的代码来绘制这个三角形：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//2. 画三角形</span></span><br><span class="line"><span class="comment">//椭圆左边焦点</span></span><br><span class="line"><span class="built_in">CGFloat</span> greenCircleFocusLeft = gcW/<span class="number">2</span>-sqrt(pow(gcW/<span class="number">2</span>, <span class="number">2</span>)-pow(gcH/<span class="number">2</span>, <span class="number">2</span>));</span><br><span class="line"><span class="comment">//椭圆右边焦点</span></span><br><span class="line"><span class="built_in">CGFloat</span> greenCircleFocusRight = gcW/<span class="number">2</span>+sqrt(pow(gcW/<span class="number">2</span>, <span class="number">2</span>)-pow(gcH/<span class="number">2</span>, <span class="number">2</span>));</span><br><span class="line"><span class="built_in">CGFloat</span> gcFL = greenCircleFocusLeft;</span><br><span class="line"><span class="built_in">CGFloat</span> gcFR = greenCircleFocusRight;</span><br><span class="line"><span class="comment">//眼睛大小</span></span><br><span class="line"><span class="built_in">CGFloat</span> eyesWidth1 = gcW/<span class="number">7.5</span>;</span><br><span class="line"><span class="comment">//2. 画三角形</span></span><br><span class="line"><span class="built_in">CGPoint</span> points[] = &#123;</span><br><span class="line"><span class="built_in">CGPointMake</span>(gcFL-eyesWidth1, greenY + gcH + (gcFL-eyesWidth1)/<span class="number">12</span><span class="number">-10</span>),</span><br><span class="line"><span class="built_in">CGPointMake</span>(greenX+gcW/<span class="number">2</span>+<span class="number">40</span>, <span class="number">1.2</span>*(greenX+gcW/<span class="number">2</span>) + greenY),</span><br><span class="line"><span class="built_in">CGPointMake</span>(gcFL+<span class="number">10</span>, <span class="number">1.8</span>*gcFL + greenY)&#125;;</span><br><span class="line"><span class="built_in">CGContextAddLines</span>(context, points, <span class="number">3</span>);</span><br><span class="line"><span class="built_in">CGContextClosePath</span>(context);</span><br><span class="line"><span class="comment">//CGContextStrokePath(context);</span></span><br><span class="line"><span class="built_in">CGContextFillPath</span>(context);</span><br></pre></td></tr></table></figure></p>
+<p>三角形的三个点的计算花了我不少时间，但是这不是重点，重点是其实很简单的问题我却傻X的花了很长时间哈，而且最终还只是凑合的，不是最优解。取消<code>CGContextStrokePath(context);</code>这句的注释，我们可以看到下图：<br><img src="http://upload-images.jianshu.io/upload_images/602268-4f89e2c1a5f51b3e?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>注释掉后即可看到：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-c6b31129fc6027fc?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h3 id="绘制眼睛"><a href="#绘制眼睛" class="headerlink" title="绘制眼睛"></a>绘制眼睛</h3><p>第3步：绘制眼睛。眼睛的位置取的是椭圆焦点的位置，而且绘制后看起来还挺对的。眼睛无非是两个黑色的圆形。如下：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//3. 画眼睛（圆）</span></span><br><span class="line">[RGB(<span class="number">45</span>, <span class="number">49</span>, <span class="number">32</span>, <span class="number">1</span>) setFill];</span><br><span class="line"><span class="built_in">CGContextFillEllipseInRect</span>(context, <span class="built_in">CGRectMake</span>(greenX + gcFL, greenY+gcH/<span class="number">4</span>, eyesWidth1, eyesWidth1));</span><br><span class="line"><span class="built_in">CGContextFillEllipseInRect</span>(context, <span class="built_in">CGRectMake</span>(greenX + gcFR-eyesWidth1, greenY+gcH/<span class="number">4</span>, eyesWidth1, eyesWidth1));</span><br></pre></td></tr></table></figure></p>
+<p>然后就是这样了：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-39483864803c1514?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h3 id="绘制白色icon"><a href="#绘制白色icon" class="headerlink" title="绘制白色icon"></a>绘制白色icon</h3><p>第4，5，6步跟1，2，3步基本是一样的，只是位置不同而已。<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//4. 画白色椭圆</span></span><br><span class="line"><span class="built_in">CGFloat</span> wcX = greenX + gcW / <span class="number">2</span>;</span><br><span class="line"><span class="built_in">CGFloat</span> wcY = greenY + gcH / <span class="number">2</span>;</span><br><span class="line"><span class="built_in">CGFloat</span> wcW = gcW * <span class="number">0.8</span>;</span><br><span class="line"><span class="built_in">CGFloat</span> wcH = gcH * <span class="number">0.8</span>;</span><br><span class="line"><span class="built_in">CGFloat</span> whiteCircleFocusLeft = wcW/<span class="number">2</span>-sqrt(pow(wcW/<span class="number">2</span>, <span class="number">2</span>)-pow(wcH/<span class="number">2</span>, <span class="number">2</span>));</span><br><span class="line"><span class="built_in">CGFloat</span> whiteCircleFocusRight = wcW/<span class="number">2</span>+sqrt(pow(wcW/<span class="number">2</span>, <span class="number">2</span>)-pow(wcH/<span class="number">2</span>, <span class="number">2</span>));</span><br><span class="line"><span class="built_in">CGFloat</span> wcFL = whiteCircleFocusLeft;</span><br><span class="line"><span class="built_in">CGFloat</span> wcFR = whiteCircleFocusRight;</span><br><span class="line"><span class="built_in">CGFloat</span> eyesWidth2 = wcW/<span class="number">7.5</span>;</span><br><span class="line"><span class="built_in">UIColor</span> *whiteColor = RGB(<span class="number">251</span>, <span class="number">251</span>, <span class="number">251</span>, <span class="number">1</span>);</span><br><span class="line">[whiteColor setFill];</span><br><span class="line"><span class="built_in">CGContextFillEllipseInRect</span>(context, <span class="built_in">CGRectMake</span>(wcX, wcY, wcW, wcH));</span><br><span class="line"><span class="comment">//5. 画白色三角形</span></span><br><span class="line"><span class="built_in">CGPoint</span> whiteTrianglePoints[] = &#123;</span><br><span class="line"><span class="built_in">CGPointMake</span>(wcFR+eyesWidth2/<span class="number">4</span>+wcX, wcY + wcH + (wcFL-eyesWidth2/<span class="number">4</span>)/<span class="number">4</span>),</span><br><span class="line"><span class="built_in">CGPointMake</span>(wcX+wcW/<span class="number">2</span>, <span class="number">0.9</span>*(wcX+wcW/<span class="number">2</span>)),</span><br><span class="line"><span class="built_in">CGPointMake</span>(wcFR+eyesWidth2, <span class="number">0.9</span>*wcFR + wcY)&#125;;</span><br><span class="line"><span class="built_in">CGContextAddLines</span>(context, whiteTrianglePoints, <span class="number">3</span>);</span><br><span class="line"><span class="built_in">CGContextClosePath</span>(context);</span><br><span class="line"><span class="built_in">CGContextFillPath</span>(context);</span><br><span class="line"><span class="comment">//6. 画眼睛（圆）</span></span><br><span class="line">[RGB(<span class="number">60</span>, <span class="number">64</span>, <span class="number">49</span>, <span class="number">1</span>) setFill];</span><br><span class="line"><span class="built_in">CGContextFillEllipseInRect</span>(context, <span class="built_in">CGRectMake</span>(wcX + wcFL, wcY + wcH/<span class="number">4</span>, eyesWidth2, eyesWidth2));</span><br><span class="line"><span class="built_in">CGContextFillEllipseInRect</span>(context, <span class="built_in">CGRectMake</span>(wcX + wcFR - eyesWidth2, wcY + wcH/<span class="number">4</span>, eyesWidth2, eyesWidth2));</span><br></pre></td></tr></table></figure></p>
+<p>OK,现在就长这样了，咋一看还是挺像的哈。<br><img src="http://upload-images.jianshu.io/upload_images/602268-cd5d7dc62588dbff?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h3 id="添加阴影"><a href="#添加阴影" class="headerlink" title="添加阴影"></a>添加阴影</h3><p>下面我们再添加一些细节上的东西。比如我们发现少了阴影，还有微信的icon上的三角形是圆角的。首先是阴影：在<code>CGFloat minWidth = MAX(160, rect.size.width);</code>这句之上加上下面的代码：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//阴影</span></span><br><span class="line"><span class="built_in">CGContextSetShadowWithColor</span>(context, <span class="built_in">CGSizeMake</span>(<span class="number">-0.5</span>, <span class="number">0.5</span>), <span class="number">6</span>, [<span class="built_in">UIColor</span> blackColor].CGColor);</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-a1314e25b6dbb263?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>阴影是加上了，但是并不是我们想要的效果。怎样才能让它只是在边缘上加阴影呢？也很简单，继续在刚才添加的语句下添加：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">CGContextBeginTransparencyLayer</span>(context, <span class="literal">nil</span>);</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-215a51140cbaff86?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>搞定，感觉还行哈，不过眼睛的阴影好像也没了。试试用同样的方法看能不能解决：在第3步画眼睛之前添加：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">CGContextEndTransparencyLayer</span>(context);</span><br><span class="line"><span class="comment">//为绿色椭圆的眼睛添加阴影</span></span><br><span class="line"><span class="built_in">CGContextSetShadowWithColor</span>(context, <span class="built_in">CGSizeMake</span>(<span class="number">-0.5</span>, <span class="number">0.5</span>), <span class="number">2</span>, [<span class="built_in">UIColor</span> blackColor].CGColor);</span><br></pre></td></tr></table></figure></p>
+<p>然后在第3步画完眼睛之后添加：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">CGContextBeginTransparencyLayer</span>(context, <span class="literal">nil</span>);</span><br></pre></td></tr></table></figure></p>
+<p>再然后在第6步画眼睛之前添加上：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//为白色椭圆的眼睛添加阴影</span></span><br><span class="line"><span class="built_in">CGContextSetShadowWithColor</span>(context, <span class="built_in">CGSizeMake</span>(<span class="number">-0.5</span>, <span class="number">0.5</span>), <span class="number">2</span>, [<span class="built_in">UIColor</span> blackColor].CGColor);</span><br></pre></td></tr></table></figure></p>
+<p>这样说有点乱，注意到了：<code>CGContextBeginTransparencyLayer(context, nil)</code> 和 <code>CGContextEndTransparencyLayer(context)</code> 是成对出现的，从函数名称可以知道它们的作用分别是开始一个透明的layer和结束一个透明的layer。而夹在它们中间的绘图操作在指定的context上被合成到一个完全透明的背景(在context中作为一个分离的目标缓冲区)。这个操作会保持context原有的裁剪区域。调用了<code>Begin</code>之后除了1.全局的透明度被设置为1；2.阴影被屏蔽外，其他的都不变。这样解释后，上面的代码应该可以理解了。现在我们的icon看起来是这样的：<br><img src="http://upload-images.jianshu.io/upload_images/602268-9dad655cc665e9d3?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h3 id="圆角三角形"><a href="#圆角三角形" class="headerlink" title="圆角三角形"></a>圆角三角形</h3><p>最后，解决下圆角三角形的问题：回到第2步，将<code>CGContextFillPath(context);</code>注释，并添加以下代码：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">CGContextSetLineJoin</span>(context, kCGLineJoinRound);</span><br><span class="line"><span class="built_in">CGContextSetLineWidth</span>(context, <span class="number">4</span>);</span><br><span class="line"><span class="built_in">CGContextSetStrokeColorWithColor</span>(context, greenColor.CGColor);</span><br><span class="line"><span class="built_in">CGContextDrawPath</span>(context, kCGPathFillStroke);</span><br></pre></td></tr></table></figure></p>
+<p>然后同理在第5步画白色三角形上注释<code>CGContextFillPath(context);</code>,并添加以下代码：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">CGContextSetLineJoin</span>(context, kCGLineJoinRound);</span><br><span class="line"><span class="built_in">CGContextSetLineWidth</span>(context, <span class="number">3</span>);</span><br><span class="line"><span class="built_in">CGContextSetStrokeColorWithColor</span>(context, whiteColor.CGColor);</span><br><span class="line"><span class="built_in">CGContextDrawPath</span>(context, kCGPathFillStroke);</span><br></pre></td></tr></table></figure></p>
+<p>好了，废话说完了，也算是完成了，最终效果：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-79c5ff06b15db5c8?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>实际上，微信的icon的颜色还是一个渐变的，在这里就不继续研究了，要实现渐变可以用<code>*CGContextDrawLinearGradient(CGContextRef context, CGGradientRef gradient, CGPoint startPoint, CGPoint endPoint, CGGradientDrawingOptions options)*</code>或<code>*CGContextDrawRadialGradient(CGContextRef context, CGGradientRef gradient, CGPoint startCenter, CGFloat startRadius, CGPoint endCenter, CGFloat endRadius, CGGradientDrawingOptions options)*</code>这两个函数。<br>bug 修复<br>command+r 编译+运行以下（现在才需要编译，这也太好了吧），然后发现成功的crash了。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-1a0568f46505d75c?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>什么原因？好吧，我把属性定义成 <code>assign</code> 了（低级错误），改成<code>strong</code> ，问题解决。</p>
+<h3 id="结束语"><a href="#结束语" class="headerlink" title="结束语"></a>结束语</h3><p>以上就是我绘制的整个编码过程，绘制微信icon实际上就用了core graphics的几个基本功能，希望能对初学者有所帮助，说错的地方也希望能得到指点哈~~<br>源码地址：<a href="https://github.com/linshaolie/blog/tree/master/DrawWechatIcon" target="_blank" rel="noopener">https://github.com/linshaolie/blog/tree/master/DrawWechatIcon</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2015/08/26/使用Core Graphics绘画一个山寨微信icon/" data-id="cjs8j5sli000feun8oum5zajh" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Core-Graphics/">Core Graphics</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2015/09/13/iOS语言本地化/" class="article-nav-link">
+        <strong class="article-nav-caption">prev</strong>
+        <div class="article-nav-title">
+          
+            iOS语言本地化
+          
+        </div>
+      </a>
+    
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

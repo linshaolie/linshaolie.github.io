@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    通过React Native动态更新iOS应用 |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-通过React Native动态更新iOS应用" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      通过React Native动态更新iOS应用
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2016/03/23/通过React Native动态更新iOS应用/" class="article-date">
+  <time datetime="2016-03-22T16:00:00.000Z" itemprop="datePublished">2016-03-23</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p>这篇文章一直拖了快1个多月了，一直都找借口不去完成它。今天终于铁了心了。开始正题。<br>做 iOS 开发的都知道，和 Android 开发不同，在提交 App 之后总是要等上至少一个星期的审核时间（加急审核除外），而如果在这等待途中发现了什么 bug，轻的话就等 Apple 审核完，产品上线后再提交新版本进行等待，严重的话可能就只能撤下 App 重新提交，重新等待了。这个问题很困扰人。之后就有了 WaxPath， JSPath 等支持用 Lua， JavaScript 等语言进行 App 动态更新的第三方库。另外，微软实现的一个叫 CodePush 的库则支持 Cordova 和 React Native 的动态部署更新。本文对这些第三方库都不进行讲解，而是通过自己的方式来实现 iOS 上 App 的动态更新。<br>我们知道，React Native 支持的语言是 JavaScript，在打包 App 前，需要对 JavaScript 进行打包。默认情况下，是通过下面的代码进行 <code>RCTRootView</code> 的初始化的:<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSURL</span> *jsCodeLocation;</span><br><span class="line">jsCodeLocation = [[<span class="built_in">NSBundle</span> mainBundle] URLForResource:<span class="string">@"main"</span> withExtension:<span class="string">@"jsbundle"</span>];</span><br><span class="line">RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation</span><br><span class="line">                                                      moduleName:<span class="string">@"MyProject"</span></span><br><span class="line">                                               initialProperties:<span class="literal">nil</span></span><br><span class="line">                                                   launchOptions:launchOptions];</span><br></pre></td></tr></table></figure></p>
+<p>这种是直接读取本地文件 URL 的方式，而在 Debug 下我们也看到这样的读取方式：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jsCodeLocation = [<span class="built_in">NSURL</span> URLWithString:<span class="string">@"http://localhost:8081/index.ios.bundle?platform=ios&amp;dev=true"</span>];</span><br></pre></td></tr></table></figure></p>
+<p>如果我们将这个 URL 换成远程服务器上的 URL，就可以动态的读取最新的 JS Bundle 了。但是实际上这种方式是不可行的，因为远程加载 JS Bundle 是需要时间的，我们总不可能让用户在那干等着吧。于是想到另外的方式，通过进入 App 之后进行检测，如果有新版本的 JS Bundle 的话，则进行新 Bundle 的下载。而这个又可以通过两种方式进行处理：<br>1、 直接告诉用户，正在下载新的资源包，并通过 loading 界面让用户进行等待；<br>2、 不让用户察觉，在后头进行新版本的下载，用户下次使用 App 的时候加载新的资源包。<br>下面我要介绍的是第二种方法。也就是通过后台更新。为了让用户每次打开 App 能拿到当前最新的 JS Bundle，我们让其从 Document 处去读取 JS Bundle，新版本的 JS Bundle 下载后也同样存在这个目录，类似下面代码：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSURL</span> *jsCodeLocation;</span><br><span class="line">jsCodeLocation = [<span class="keyword">self</span> URLForCodeInDocumentsDirectory];</span><br><span class="line">  <span class="keyword">if</span> (![<span class="keyword">self</span> hasCodeInDocumentsDirectory]) &#123;</span><br><span class="line">    <span class="comment">//从 Document 上读取 JS Bundle</span></span><br><span class="line">    <span class="built_in">BOOL</span> copyResult = [<span class="keyword">self</span> copyBundleFileToURL:jsCodeLocation];</span><br><span class="line">    <span class="keyword">if</span> (!copyResult) &#123;</span><br><span class="line">      <span class="comment">//拷贝失败，从 main Bundle 上读取</span></span><br><span class="line">      jsCodeLocation = [<span class="keyword">self</span> URLForCodeInBundle];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  RCTBridge *bridge = [<span class="keyword">self</span> createBridgeWithBundleURL:jsCodeLocation];</span><br><span class="line">  rootView = [<span class="keyword">self</span> createRootViewWithBridge:bridge];</span><br></pre></td></tr></table></figure></p>
+<p>上面代码只是进行了 Bundle 的读取操作，由于每个 JS 包需要进行版本的控制，所以，我将版本的检测放到了 JavaScript 里面，在 <em>index.ios.js</em> 文件开头，定义了一个常量<code>const JSBundleVersion = 1.0;    //JS 版本号</code>，每次迭代新的 JS 版本则让其加 0.01。而如果向 APP Store 提交新版本，比如提交了 1.1 版本，则相应的将 JSBundleVersion 设置为 1.1，为什么这样做我后面再详细说明。<br>当检测到有新的 JS 版本时，则通知 Native 进行 JS 的下载和保存，当然也可以直接在 JS 上进行下载保存。如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">getLatestVersion(<span class="function">(<span class="params">err, version</span>)=&gt;</span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (err || !version) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">let</span> serverJSVersion = version.jsVersion;</span><br><span class="line">  <span class="keyword">if</span> (serverJSVersion &gt; JSBundleVersion) &#123;</span><br><span class="line">    <span class="comment">//通知 Native 有新的 JS 版本</span></span><br><span class="line">    NativeNotification.postNotification(<span class="string">'HadNewJSBundleVersion'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>Native 接到通知后，负责去下载新的 JS bundle，下载成功后并保存到指定路径，用户下次打开 App 时直接加载即可。<br>这里有几个地方可以优化一下：</p>
+<ol>
+<li>当检测到有新版本时，进一步判断用户当前网络是否是 wifi 网络，如果是则通知 native 下载，反之不下载。</li>
+<li>在 1 的条件下，添加一个网络改变的监测，因为很多情况下用户在非 wifi 网络下打开了 App 但是之后 App 又没被 kill 掉，这样就下载不到最新的 bundle 了，所以通过监测网络的改变，如果网络变为 wifi 并且有新版本，则下载。于是代码大概如下：</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> JSBundleVersion = <span class="number">1.0</span>;</span><br><span class="line"><span class="keyword">let</span> hadDownloadJSBundle = <span class="literal">true</span>;</span><br><span class="line"><span class="comment">//.....</span></span><br><span class="line">componentDidMount() &#123;</span><br><span class="line">    NetInfo.addEventListener(<span class="string">'change'</span>, (reachability) =&gt; &#123;</span><br><span class="line">      <span class="keyword">if</span> (reachability == <span class="string">'wifi'</span> &amp;&amp; hadDownloadJSBundle == <span class="literal">false</span>) &#123;</span><br><span class="line">        hadDownloadJSBundle = <span class="literal">true</span>;</span><br><span class="line">        NativeNotification.postNotification(<span class="string">'HadNewJSBundleVersion'</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">this</span>._checkUpdate();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">_checkUpdate() &#123;</span><br><span class="line">    getLatestVersion(<span class="function">(<span class="params">err, version</span>)=&gt;</span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (err || !version) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">let</span> serverJSVersion = version.jsVersion;</span><br><span class="line">      <span class="keyword">if</span> (serverJSVersion &gt; JSBundleVersion) &#123;</span><br><span class="line">        <span class="comment">//通知 Native 有新的 JS 版本</span></span><br><span class="line">        isWifi(<span class="function">(<span class="params">wifi</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (wifi) &#123;</span><br><span class="line">            hadDownloadJSBundle = <span class="literal">true</span>;</span><br><span class="line">            NativeNotification.postNotification(<span class="string">'HadNewJSBundleVersion'</span>);</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            hadDownloadJSBundle = <span class="literal">false</span>;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>JS 代码基本就这些，接下来看看在 native 上需要做哪些操作。<br>首先，要接收到下载 JS bundle 的通知，当然是要先注册为观察者了。</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">BOOL</span>)application:(<span class="built_in">UIApplication</span> *)application didFinishLaunchingWithOptions:(<span class="built_in">NSDictionary</span> *)launchOptions &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  [NativeNotificationManager addObserver:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(hadNewJSBundleVersion:) name:<span class="string">@"HadNewJSBundleVersion"</span> object:<span class="literal">nil</span>];</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>hadNewJSBundleVersion</code> 方法里面根据需求下载 JS bundle， 为了能保证下载的包完整，我们可以同时准备一份 JS bundle 的 md5 码，用于校验。如下：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)hadNewJSBundleVersion:(<span class="built_in">NSNotification</span> *)notification &#123;</span><br><span class="line">  <span class="comment">//根据需求设置下载地址</span></span><br><span class="line">  <span class="built_in">NSString</span> *version = APP_VERSION;</span><br><span class="line">  <span class="built_in">NSString</span> *base = [<span class="string">@"http://domain/"</span> stringByAppendingString:version];</span><br><span class="line">  <span class="built_in">NSString</span> *uRLStr = [base stringByAppendingString:<span class="string">@"/main.jsbundle"</span>];</span><br><span class="line">  <span class="built_in">NSString</span> *md5URLStr = [base stringByAppendingString:<span class="string">@"/mainMd5.jsbundle"</span>];</span><br><span class="line">  <span class="comment">//存储路径为每次打开 App 要加载 JS 的路径</span></span><br><span class="line">  <span class="built_in">NSURL</span> *dstURL = [<span class="keyword">self</span> URLForCodeInDocumentsDirectory];</span><br><span class="line">  [<span class="keyword">self</span> downloadCodeFrom:uRLStr md5URLString:md5URLStr toURL:dstURL completeHandler:^(<span class="built_in">BOOL</span> result) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"finish: %@"</span>, @(result));</span><br><span class="line">  &#125;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>downloadCodeFrom: md5URLString: toURL：completeHandler</code> 方法就赋值下载，检验和保存操作。<br>（注意这句代码：<br><code>NSString *base = [@&quot;http://domain/&quot; stringByAppendingString:version];</code>，这跟我们远程服务器存储文件的路径有关，我会在后面进行说明）。<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)downloadCodeFrom:(<span class="built_in">NSString</span> *)srcURLString</span><br><span class="line">            md5URLString:(<span class="built_in">NSString</span> *)md5URLString</span><br><span class="line">                   toURL:(<span class="built_in">NSURL</span> *)dstURL</span><br><span class="line">         completeHandler:(CompletionBlock)complete &#123;</span><br><span class="line">  <span class="comment">//下载MD5数据</span></span><br><span class="line">  [SLNetworkManager sendWithRequestMethor:(RequestMethodGET) URLString:md5URLString parameters:<span class="literal">nil</span> error:<span class="literal">nil</span> completionHandler:^(<span class="built_in">NSData</span> *md5Data, <span class="built_in">NSURLResponse</span> *response, <span class="built_in">NSError</span> *connectionError) &#123;</span><br><span class="line">    <span class="keyword">if</span> (connectionError &amp;&amp; md5Data.length &lt; <span class="number">32</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//下载JS</span></span><br><span class="line">    [SLNetworkManager sendWithRequestMethor:(RequestMethodGET) URLString:srcURLString parameters:<span class="literal">nil</span> error:<span class="literal">nil</span> completionHandler:^(<span class="built_in">NSData</span> *data, <span class="built_in">NSURLResponse</span> *response, <span class="built_in">NSError</span> *connectionError) &#123;</span><br><span class="line">      <span class="keyword">if</span> (connectionError || data.length &lt; <span class="number">10000</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      </span><br><span class="line">      <span class="comment">//MD5 校验</span></span><br><span class="line">      <span class="built_in">NSString</span> *md5String = [[<span class="built_in">NSString</span> alloc] initWithData:md5Data encoding:<span class="built_in">NSUTF8StringEncoding</span>];</span><br><span class="line">      <span class="keyword">if</span>(checkMD5(data, md5String)) &#123;</span><br><span class="line">        <span class="comment">//校验成功，写入文件</span></span><br><span class="line">        <span class="built_in">NSError</span> *error = <span class="literal">nil</span>;</span><br><span class="line">        [data writeToURL:dstURL options:(<span class="built_in">NSDataWritingAtomic</span>) error:&amp;error];</span><br><span class="line">        <span class="keyword">if</span> (error) &#123;</span><br><span class="line">          !complete ?: complete(<span class="literal">NO</span>);</span><br><span class="line">          <span class="comment">//写入失败，删除</span></span><br><span class="line">          [SLFileManager deleteFileWithURL:dstURL error:<span class="literal">nil</span>];</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          !complete ?: complete(<span class="literal">YES</span>);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;];</span><br><span class="line">  &#125;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>到这里，检测更新，下载新 bundle 的操作就算完成了。<br>下面，来完成文件读取并初始化 <code>RCTRootView</code> 的操作。在 AppDelegate 内我们通过调用自定义方法来获得 <code>RCTRootView</code> ，如下：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">BOOL</span>)application:(<span class="built_in">UIApplication</span> *)application didFinishLaunchingWithOptions:(<span class="built_in">NSDictionary</span> *)launchOptions</span><br><span class="line">&#123;</span><br><span class="line">  RCTRootView *rootView = [<span class="keyword">self</span> getRootViewModuleName:<span class="string">@"DynamicUpdateDemo"</span> launchOptions:launchOptions];</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">self</span>.window = [[<span class="built_in">UIWindow</span> alloc] initWithFrame:[<span class="built_in">UIScreen</span> mainScreen].bounds];</span><br><span class="line">  <span class="built_in">UIViewController</span> *rootViewController = [<span class="built_in">UIViewController</span> new];</span><br><span class="line">  rootViewController.view = rootView;</span><br><span class="line">  <span class="keyword">self</span>.window.rootViewController = rootViewController;</span><br><span class="line">  [<span class="keyword">self</span>.window makeKeyAndVisible];</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>getRootViewModuleName:launchOptions</code>方法负责处理一些我们需要的逻辑（如：根据是否在Debug模式下，是否在模拟器上等不同状态初始化不同的<strong>rootView</strong>），最终返回一个 <code>RCTRootView</code> 对象。<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">- (RCTRootView *)getRootViewModuleName:(<span class="built_in">NSString</span> *)moduleName</span><br><span class="line">                         launchOptions:(<span class="built_in">NSDictionary</span> *)launchOptions &#123;</span><br><span class="line">  <span class="built_in">NSURL</span> *jsCodeLocation = <span class="literal">nil</span>;</span><br><span class="line">  RCTRootView *rootView = <span class="literal">nil</span>;</span><br><span class="line"><span class="meta">#if DEBUG</span></span><br><span class="line"><span class="meta">#if TARGET_OS_SIMULATOR</span></span><br><span class="line">  <span class="comment">//debug simulator</span></span><br><span class="line">  jsCodeLocation = [<span class="built_in">NSURL</span> URLWithString:<span class="string">@"http://localhost:8081/index.ios.bundle?platform=ios&amp;dev=true"</span>];</span><br><span class="line"><span class="meta">#else</span></span><br><span class="line">  <span class="comment">//debug device</span></span><br><span class="line">  <span class="built_in">NSString</span> *serverIP = [[<span class="built_in">NSBundle</span> mainBundle] objectForInfoDictionaryKey:<span class="string">@"SERVER_IP"</span>];</span><br><span class="line">  <span class="built_in">NSString</span> *jsCodeUrlString = [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"http://%@:8081/index.ios.bundle?platform=ios&amp;dev=true"</span>, serverIP];</span><br><span class="line">  <span class="built_in">NSString</span> *jsBundleUrlString = [jsCodeUrlString stringByAddingPercentEscapesUsingEncoding:<span class="built_in">NSUTF8StringEncoding</span>];</span><br><span class="line">  jsCodeLocation = [<span class="built_in">NSURL</span> URLWithString:jsBundleUrlString];</span><br><span class="line"><span class="meta">#endif</span></span><br><span class="line">  rootView = [<span class="keyword">self</span> createRootViewWithURL:jsCodeLocation moduleName:moduleName launchOptions:launchOptions];</span><br><span class="line"><span class="meta">#else</span></span><br><span class="line">  <span class="comment">//production</span></span><br><span class="line">  jsCodeLocation = [<span class="keyword">self</span> URLForCodeInDocumentsDirectory];</span><br><span class="line">  <span class="keyword">if</span> (![<span class="keyword">self</span> hasCodeInDocumentsDirectory]) &#123;</span><br><span class="line">    [<span class="keyword">self</span> resetJSBundlePath];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">BOOL</span> copyResult = [<span class="keyword">self</span> copyBundleFileToURL:jsCodeLocation];</span><br><span class="line">    <span class="keyword">if</span> (!copyResult) &#123;</span><br><span class="line">      jsCodeLocation = [<span class="keyword">self</span> URLForCodeInBundle];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  RCTBridge *bridge = [<span class="keyword">self</span> createBridgeWithBundleURL:jsCodeLocation];</span><br><span class="line">  rootView = [<span class="keyword">self</span> createRootViewWithModuleName:moduleName bridge:bridge];</span><br><span class="line">  </span><br><span class="line"><span class="meta">#endif</span></span><br><span class="line">  </span><br><span class="line"><span class="meta">#if 0 &amp;&amp; DEBUG</span></span><br><span class="line">  jsCodeLocation = [<span class="keyword">self</span> URLForCodeInDocumentsDirectory];</span><br><span class="line">  <span class="keyword">if</span> (![<span class="keyword">self</span> hasCodeInDocumentsDirectory]) &#123;</span><br><span class="line">    [<span class="keyword">self</span> resetJSBundlePath];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">BOOL</span> copyResult = [<span class="keyword">self</span> copyBundleFileToURL:jsCodeLocation];</span><br><span class="line">    <span class="keyword">if</span> (!copyResult) &#123;</span><br><span class="line">      jsCodeLocation = [<span class="keyword">self</span> URLForCodeInBundle];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  RCTBridge *bridge = [<span class="keyword">self</span> createBridgeWithBundleURL:jsCodeLocation];</span><br><span class="line">  rootView = [<span class="keyword">self</span> createRootViewWithModuleName:moduleName bridge:bridge];</span><br><span class="line"><span class="meta">#endif</span></span><br><span class="line">  <span class="keyword">return</span> rootView;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里，我们主要看 production 部分。上面其实已经贴出一次这段代码，在这之前我先说下我们存放和读取 JS 的路径。首先在 Documents 内创建一个目录叫 JSBundle，然后根据当前 App 的版本号再创建一个和版本号相同名字的目录（如：1.0， 1.1），最后路径大概这样：<em>…/Documents/JSBundle/1.0/main.jsbundle</em></p>
+<p>下面讲解下思路：首先判断我们的目标路径是否存在 JS bundle（用户首次安装或更新版本后该路径是不存在 JS 的），如果不存在，则将项目上的 JS bundle 拷贝到该路径下。可以看到在拷贝之前调用了 <code>resetJSBundlePath</code> 方法，该方法的作用是将这个路径的其他文件清除，这样做的原因是：从旧版本更新到新版本（这里指的是App发布的新版本）后，之前旧的 JS bundle 还存在着。为了保险起见，得判断一下文件是否拷贝成功了，如果没成功，则将读取路径设置成项目上的 JS bundle 路径。最后，创建 bridge，创建 rootView 并返回。<br>这样，动态更新的操作就完成了。还有一件事，上面说到的代码<br><code>NSString *base = [@&quot;http://domain/&quot; stringByAppendingString:version];</code><br>为什么要这样做呢？原因很简单：为了兼容不同版本。举个例子：你发布了1.0版本后，下载路径是 <em><a href="http://domain/1.0/main.jsbundle" target="_blank" rel="noopener">http://domain/1.0/main.jsbundle</a></em>，过了一段时间你又发布了1.1 版本， 这时下载路径是 <em><a href="http://domain/1.1/main.jsbundle" target="_blank" rel="noopener">http://domain/1.1/main.jsbundle</a></em>，1.1版本中，你可能在 native 上添加了其他文件，或者是更新了 react-native 的版本，这时，如果让还是 1.0 版本的用户下载了 1.1 的 JS bundle，问题就来了，你懂得。这只是我个人的解决方案，当然，这些其实完全可以放到服务器端去处理的，服务器端提供一个接口，我们可以通过传递当前 App 的版本号，服务器判断是否有新的 JS bundle 后返回下载路径，然后前端再进行下载存储。至于用什么方法大家觉得哪种方便就用哪种吧。</p>
+<p>最后，说下目前我将 JS bundle 远程存放的服务器和版本检测所用的方法。</p>
+<ol>
+<li>文件我存放在了阿里云上，它会根据你存放的位置给你生成一个目标URL；</li>
+<li>版本检测我的方法是：在远程数据库上创建一个表格，字段分别有 </li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>forceUpdate</th>
+<th>newestVersion</th>
+<th>nativeVersion</th>
+<th>JSVersion</th>
+<th>platform</th>
+<th>message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>false</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>iOS</td>
+<td>有新版本提示</td>
+</tr>
+</tbody>
+</table>
+<p>根据字段名称基本都能明白了，这里就不啰嗦了。</p>
+<p>说了这么多，总结一下步骤：</p>
+<ul>
+<li>JS 端检测是否有新的 JS bundle，有则通知 native 下载</li>
+<li>native 下载完 JS 后进行 md5 的校验，并存储</li>
+<li>每次打开 App 检测要读取的路径是否有 JS</li>
+<li>有则直接读取，没有则进行拷贝</li>
+</ul>
+<p>这里，我写了个<a href="https://github.com/linshaolie/DynamicUpdateDemo" target="_blank" rel="noopener">Demo</a>，可供参考，如有任何问题，欢迎大家进行讨论。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2016/03/23/通过React Native动态更新iOS应用/" data-id="cjs8k54af0010eun8tu5rgqpu" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RN/">RN</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2017/06/13/UIDebuggingInformationOverlay使用介绍/" class="article-nav-link">
+        <strong class="article-nav-caption">prev</strong>
+        <div class="article-nav-title">
+          
+            UIDebuggingInformationOverlay使用介绍
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2016/01/24/React Native环境搭建/" class="article-nav-link">
+        <strong class="article-nav-caption">下一页</strong>
+        <div class="article-nav-title">React Native环境搭建</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

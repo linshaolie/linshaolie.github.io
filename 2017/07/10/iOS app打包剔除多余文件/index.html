@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    iOS app打包剔除多余文件 |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-iOS app打包剔除多余文件" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      iOS app打包剔除多余文件
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2017/07/10/iOS app打包剔除多余文件/" class="article-date">
+  <time datetime="2017-07-09T16:00:00.000Z" itemprop="datePublished">2017-07-10</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p>应用场景：在开发app过程中，你肯定需要有测试环境，而测试环境和线上环境的切换如果你是根据修改代码来实现那你就太low了。这时候你会实现一个debug功能模块，不但你能进行环境切换，产品经理，测试员同样能用这功能。而随着产品逐渐成熟，需要的debug功能也会越来越多，如：ABTest切换，用户登录登出，指定页面跳转，日志查看等功能。从另一个方面说你的debug模块代码会越来越多。那么，怎样让debug代码不污染线上app呢？</p>
+<p>一般，你可能会想到的是我只需要在每个类或方法上添加上宏的判断就行了，在debug下才会定义某个类或方法，如下：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#if DEBUG</span></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">DebugA</span> : <span class="title">UIViewController</span> </span></span><br><span class="line"><span class="comment">// 方法...</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="meta">#endif</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#if DEBUG</span></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">DebugA</span></span></span><br><span class="line"><span class="comment">// 方法实现...</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"><span class="meta">#endif</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#if DEBUG</span></span><br><span class="line">DebugA *a = [[DebugA alloc] init] ;</span><br><span class="line"><span class="comment">// 方法调用...</span></span><br><span class="line"><span class="meta">#endif</span></span><br></pre></td></tr></table></figure></p>
+<p>上面的方法，看起来是可行的。它保证了只有在 Debug 环境下，才会有 <code>DebugA</code> 类的定义和实现，也保证了只在 Debug 环境下才对 DebugA 进行实例化。</p>
+<p>问题： 虽然在 Release 下类和方法是没定义了，但是文件在打包的时候还是会被打包进app， 另外，类的定义和实现都用宏包起来，从一定程度上对代码造成了污染； 另一个问题，如果在实现过程中涉及到图片或者xib的使用，这些文件在 Release 下即使不显示也不使用，但是已经被打包进 app 了。怎么杜绝这两个问题呢？</p>
+<p><strong>EXCLUDED_SOURCE_FILE_NAMES</strong> 能很好的帮你解决这个问题。从key的名称可以大概知道，它是用来 <strong>通过文件名排除资源文件</strong> 的。<br>你只需要在相应的 Target 下的 Build Settings 中添加 User-Defined Setting，然后添加 <strong>EXCLUDED_SOURCE_FILE_NAMES</strong>，并在不同编译配置下进行文件名的忽略（支持正则匹配）即可。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-da4a9f8acea2bb0a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="添加User-Defined Setting"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-17ba1bcfc2f12e68.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="添加EXCLUDED_SOURCE_FILE_NAMES  key"></p>
+<p>上图，在 Release 下通过匹配文件名存在 Debug 字样的文件，这样，在 Release 下就会将文件名包含 Debug 的文件忽略了。所以，在定义 debug 功能模块的类和方法上都不需要通过 <code>#if Debug    #endif</code> 来污染代码了，同样的，debug 的资源文件也不会被打包进 Release 下的 app 内了。</p>
+<p>等等，问题解决了吗？如果你的需求是只要 release 下就排除 debug 文件，那上面的方案已经足够了。但如果你遇到像我这样的需求，那就得另寻蹊径了。</p>
+<p>由于公司项目使用 cocopods 来管理各个业务线模块，每个业务在更新了业务代码后需要打一个提供给其他业务使用的 rc 包，而这个 rc 包的打包环境是 Release，但我们又需要 debug 功能。基于这种需求，我们通过 ruby 脚本动态的定义了一个宏：IS_BETA，下面是代码片段：<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> xcconfig.<span class="keyword">include</span>? <span class="string">'GCC_PREPROCESSOR_DEFINITIONS = $(inherited)'</span></span><br><span class="line">    <span class="keyword">if</span> debugMode</span><br><span class="line">        c1 = xcconfig.sub(<span class="string">'GCC_PREPROCESSOR_DEFINITIONS = $(inherited)'</span>, <span class="string">'GCC_PREPROCESSOR_DEFINITIONS = $(inherited) IS_BETA=1'</span>)</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        c1 = xcconfig.sub(<span class="string">'GCC_PREPROCESSOR_DEFINITIONS = $(inherited)'</span>, <span class="string">'GCC_PREPROCESSOR_DEFINITIONS = $(inherited) IS_BETA=0'</span>)</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    File.open(xcconfig_path, <span class="string">"w"</span>) &#123; <span class="params">|file|</span> file &lt;&lt; c1 &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    <span class="keyword">if</span> debugMode</span><br><span class="line">        s1 = <span class="string">'GCC_PREPROCESSOR_DEFINITIONS = IS_BETA=1'</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        s1 = <span class="string">'GCC_PREPROCESSOR_DEFINITIONS = IS_BETA=0'</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    File.open(xcconfig_path, <span class="string">"a+"</span>) &#123; <span class="params">|file|</span> file.write(<span class="string">"\n<span class="subst">#&#123;s1&#125;</span>"</span>) &#125;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></p>
+<p>内部代码则是通过这个宏来判断是否引入 debug 代码，如下：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#if IS_BETA</span></span><br><span class="line">DebugA *a = [[DebugA alloc] init] ;</span><br><span class="line"><span class="comment">// 方法调用</span></span><br><span class="line"><span class="meta">#endif</span></span><br></pre></td></tr></table></figure></p>
+<p>这时候，上面的方法就没法用了。既然这个宏是通过脚本动态写入的，我们是否同样可以动态写入 <strong>EXCLUDED_SOURCE_FILE_NAMES</strong> 的值呢？当然是可以的。同样通过 ruby 脚本，引入当前项目模块，遍历所有 target 的 build configuration，然后根据当前要编译的类型（这里定义为 defaultType)给 <strong> EXCLUDED_SOURCE_FILE_NAMES</strong> 对应的设置上值。如下：<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require</span> <span class="string">'xcodeproj'</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dealBuildSettings</span></span></span><br><span class="line">    project = Xcodeproj::Project.open(<span class="string">'./Train.xcodeproj'</span>)</span><br><span class="line">    project.targets.each <span class="keyword">do</span> <span class="params">|target|</span></span><br><span class="line">        target.build_configurations.each <span class="keyword">do</span> <span class="params">|config|</span></span><br><span class="line">            <span class="keyword">if</span> $defaultType == <span class="string">'rc'</span></span><br><span class="line">                config.build_settings[<span class="string">'EXCLUDED_SOURCE_FILE_NAMES'</span>] = <span class="string">''</span></span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">if</span> config.name == <span class="string">'Release'</span></span><br><span class="line">                    config.build_settings[<span class="string">'EXCLUDED_SOURCE_FILE_NAMES'</span>] = <span class="string">'*Debug*.*'</span></span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    config.build_settings[<span class="string">'EXCLUDED_SOURCE_FILE_NAMES'</span>] = <span class="string">''</span></span><br><span class="line">                <span class="keyword">end</span></span><br><span class="line">            <span class="keyword">end</span></span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    project.save()</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></p>
+<p>最后在 podfile 引入这个脚本，并执行下 dealBuildSettings 即可。这样，在通过 Jenkins打包时，执行 podfile 后就会动态根据环境去设置 <strong> EXCLUDED_SOURCE_FILE_NAMES</strong> 的值了。</p>
+<p><em>附：</em><br>通过 <code>xcodebuild -showBuildSettings</code> 可以查看当前项目下的所有配置信息； <code>xcodebuild -configuration Release -showBuildSettings</code> 命令，可以查看当前项目 Release下的所有配置信息，通过这些配置信息你可以在写脚本时知道对应的 key 名称。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2017/07/10/iOS app打包剔除多余文件/" data-id="cjs8kex7h001geun84baaizjk" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/iOS-打包/">iOS 打包</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2017/07/24/iconfont 实践及使用优化/" class="article-nav-link">
+        <strong class="article-nav-caption">prev</strong>
+        <div class="article-nav-title">
+          
+            iconfont 实践及使用优化
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2017/06/24/Swift到Kotlin轻松转换/" class="article-nav-link">
+        <strong class="article-nav-caption">下一页</strong>
+        <div class="article-nav-title">Swift到Kotlin轻松转换</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

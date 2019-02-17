@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    UIDebuggingInformationOverlay使用介绍 |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-UIDebuggingInformationOverlay使用介绍" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      UIDebuggingInformationOverlay使用介绍
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2017/06/13/UIDebuggingInformationOverlay使用介绍/" class="article-date">
+  <time datetime="2017-06-12T16:00:00.000Z" itemprop="datePublished">2017-06-13</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p>前些天，<a href="http://ryanipete.com/blog/ios/swift/objective-c/uidebugginginformationoverlay/?utm_campaign=iOS%2BDev%2BWeekly&amp;utm_medium=email&amp;utm_source=iOS_Dev_Weekly_Issue_303" target="_blank" rel="noopener">Ryan Peterson</a> 在看 UIKit 的私有头文件时发现了一个之前没看过的类： <code>UIDebuggingInformationOverlay</code>，并把这个发现分享了出来，下面来看看这个类具体的作用。</p>
+<p>从类名可以大致知道它是用来 debug 用的。是的，<code>UIDebuggingInformationOverlay</code> 是 <code>UIWindow</code> 的一个子类，主要是用来给开发者和设计师进行UI调试用的（估计是Apple内部人员使用的）。</p>
+<p>它大概是长这样的：<br><img src="http://upload-images.jianshu.io/upload_images/602268-f9d2a2c20fec5513.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="长这样"></p>
+<p>怎么用呢？首先我们得让它显示出来，通过类方法 <code>prepareDebuggingOverlay</code> 加载下这个视图，然后又两种方式可以让它显示：</p>
+<p>1.调用 <code>overlay</code> 方法，拿到实例，再调用实例方法 <code>toggleVisibility</code> 即可显示。因为是私有API所以需要用运行时的方式来执行，代码如下：<br><figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Objective-C</span></span><br><span class="line">Class overlayClass = <span class="built_in">NSClassFromString</span>(<span class="string">@"UIDebuggingInformationOverlay"</span>);</span><br><span class="line">[overlayClass performSelector:<span class="built_in">NSSelectorFromString</span>(<span class="string">@"prepareDebuggingOverlay"</span>)];</span><br><span class="line">Class overlay = [overlayClass performSelector:<span class="built_in">NSSelectorFromString</span>(<span class="string">@"overlay"</span>)];</span><br><span class="line">[overlay performSelector:<span class="built_in">NSSelectorFromString</span>(<span class="string">@"toggleVisibility"</span>)];</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// swift</span></span><br><span class="line"><span class="keyword">let</span> overlayClass = <span class="type">NSClassFromString</span>(<span class="string">"UIDebuggingInformationOverlay"</span>) <span class="keyword">as</span>? <span class="type">UIWindow</span>.<span class="type">Type</span></span><br><span class="line"><span class="number">_</span> = overlayClass?.perform(<span class="type">NSSelectorFromString</span>(<span class="string">"prepareDebuggingOverlay"</span>))</span><br><span class="line"><span class="keyword">let</span> overlay = overlayClass?.perform(<span class="type">NSSelectorFromString</span>(<span class="string">"overlay"</span>)).takeUnretainedValue() <span class="keyword">as</span>? <span class="type">UIWindow</span></span><br><span class="line"><span class="number">_</span> = overlay?.perform(<span class="type">NSSelectorFromString</span>(<span class="string">"toggleVisibility"</span>))</span><br></pre></td></tr></table></figure>
+<p>2.执行了<code>prepareDebuggingOverlay</code>方法之后，只需要通过 <strong>两个手指同时点击顶部状态栏</strong> 即可唤醒这个浮层。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-8d0e717152897ba8.gif?imageMogr2/auto-orient/strip" alt="唤醒"></p>
+<p>显示出来后，再看看具体能做什么。</p>
+<h2 id="View-Hierarchy"><a href="#View-Hierarchy" class="headerlink" title="View Hierarchy"></a>View Hierarchy</h2><p>显示视图的层级关系，点击又上角的 <code>Inspect</code> 可以进行App的视图的选择，并查看视图的详细信息。如果你对 App 有多个 window，可以通过 <code>Change Current Window</code> 进行切换查看不同 window 的视图层级关系及各个视图的详细信息。同样的，你也可以查看系统的 window。比如下面查看系统键盘这个 window：<br><img src="http://upload-images.jianshu.io/upload_images/602268-29a3eaebdbd2da49.gif?imageMogr2/auto-orient/strip" alt="View Hierarchy"></p>
+<h2 id="VC-Hierarchy"><a href="#VC-Hierarchy" class="headerlink" title="VC Hierarchy"></a>VC Hierarchy</h2><p>和 <em>View Hierarchy</em> 类似，你可以查看每个 VC 的层级，并且可以查看每个 VC 上视图的详细信息，同时，还提供了所查看的 VC 是否 presenting 了 modal 或者是被 presented。<br><img src="http://upload-images.jianshu.io/upload_images/602268-842eb06c4cf2c673.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="VC Hierarchy"></p>
+<h2 id="Ivar-Explorer"><a href="#Ivar-Explorer" class="headerlink" title="Ivar Explorer"></a>Ivar Explorer</h2><p>Ivar Explorer 可以让开发者查看当前 <code>UIApplication</code> 实例的变量。如下，如果变量是个对象，还可以查看对象内部的变量，如：delegate， statusBar 等（后面即将介绍的两个才是重头戏）。<br><img src="http://upload-images.jianshu.io/upload_images/602268-7ec1f7f67b7e57a9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Ivar Explorer"></p>
+<h2 id="Measure"><a href="#Measure" class="headerlink" title="Measure"></a>Measure</h2><p>从名称上可以知道，这是测量用的。是的，有了它，你就可以直接测量当前视图了。操作起来也很简单：先选择是要测量垂直的还是测量水平的，然后手指在屏幕上移动即可测量。如下：<br><img src="http://upload-images.jianshu.io/upload_images/602268-6449062e19a40b2b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Measure"></p>
+<p>另外，我们发现，有个开关写着<code>View Mode</code>，打开之后，就可以测量每个组件的宽高了，如下：<br><img src="http://upload-images.jianshu.io/upload_images/602268-e608f83c9b8375c2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="View Mode for Measure"></p>
+<h2 id="Spec-Compare"><a href="#Spec-Compare" class="headerlink" title="Spec Compare"></a>Spec Compare</h2><p>这个功能更牛，更实用。设计师给你一张图，你按着图布局完后，想看看是否和UI图一致，之前我都是截个图，然后自己量。有了它，方便了多少自己体会哈。我们可以将UI图添加进来，然后手指向上下滑动来调节图片的透明度（从下到上图片透明度0~1），就可以看出哪些组件布局有问题了。<br><strong>提示：</strong> 1. 添加图片后，调试框会隐藏，双击屏幕即可重新显示； 2. 由于添加图片需要访问图片库，所以需要在项目的plist文件上添加 <code>Privacy - Photo Library Usage Description</code> 这一项，描述内容自定。<br>效果如下：<br><img src="http://upload-images.jianshu.io/upload_images/602268-580a218c1251a2d6.gif?imageMogr2/auto-orient/strip" alt="UI Compare"></p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>以上，就是 <code>UIDebuggingInformationOverlay</code> 的基本使用，能否利用它来做更多调试的事情，就得靠自己去挖掘了。并附上<a href="https://github.com/linshaolie/DebuggingOverlayDemo" target="_blank" rel="noopener">Demo</a>地址：<br><a href="https://github.com/linshaolie/DebuggingOverlayDemo" target="_blank" rel="noopener">https://github.com/linshaolie/DebuggingOverlayDemo</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2017/06/13/UIDebuggingInformationOverlay使用介绍/" data-id="cjs8k9psx0014eun8d9pju1we" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Debug/">Debug</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2017/06/24/Swift到Kotlin轻松转换/" class="article-nav-link">
+        <strong class="article-nav-caption">prev</strong>
+        <div class="article-nav-title">
+          
+            Swift到Kotlin轻松转换
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2016/03/23/通过React Native动态更新iOS应用/" class="article-nav-link">
+        <strong class="article-nav-caption">下一页</strong>
+        <div class="article-nav-title">通过React Native动态更新iOS应用</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

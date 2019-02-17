@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    UIActivityViewController的使用 |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-UIActivityViewController的使用" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      UIActivityViewController的使用
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2015/10/04/UIActivityViewController的使用/" class="article-date">
+  <time datetime="2015-10-03T16:00:00.000Z" itemprop="datePublished">2015-10-04</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p><code>UIActivityViewController</code>是iOS上为App实现多种服务的一个标准视图控制器，系统默认提供了很多的标准服务，如拷贝链接，添加到Safari阅读列表，还有就是多平台的分享，包括微博，Facebook，email等。其实看起来就是一个actionSheet。</p>
+<p>我们的任务是负责配置、显示和关闭这个视图控制器，配置也就是为这个视图控制器提供数据源。当然，我们也可以根据需要自定义自己服务（通过继承UIActivity）。在iPad上，我们以popover的形式显示这个视图控制器；而在 iPhone 和 iPod touch上, 我们需要以模态的形式显示。</p>
+<p>先写一个最基本的代码：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> image = <span class="type">UIImage</span>(named: <span class="string">"iOS9"</span>)</span><br><span class="line"><span class="keyword">let</span> str = <span class="string">"hello iOS9"</span></span><br><span class="line"><span class="keyword">let</span> url = <span class="type">NSURL</span>(string: <span class="string">"http://helloseed.io"</span>)</span><br><span class="line"><span class="keyword">let</span> items:[<span class="type">AnyObject</span>] = [image!, str, url!];</span><br><span class="line"></span><br><span class="line"><span class="keyword">self</span>.presentViewController(vc, animated: <span class="literal">true</span>, completion: <span class="literal">nil</span>)</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-e4d4a926e4fa6caf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="标准显示"><br>可以看到，几句代码就可以显示出我们需要的controller了。Activity分为两类，图中可以看到它被分割线分为上下两部分，上面部分为Share（Objective-C为UIActivityCategoryShare)类型,下面部分为Action(Objective-C为UIActivityCategoryAction)类型。</p>
+<p>下面我们添加如下代码：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vc.completionWithItemsHandler = &#123;(activityType:<span class="type">String?</span>, completed:<span class="type">Bool</span>, returnedItems:[<span class="type">AnyObject</span>]?, activityError:<span class="type">NSError?</span>) -&gt; <span class="type">Void</span> <span class="keyword">in</span></span><br><span class="line">	<span class="keyword">if</span> completed &#123;</span><br><span class="line">        <span class="keyword">self</span>.alert(<span class="string">"成功"</span>)</span><br><span class="line">       &#125;</span><br><span class="line">	vc.completionWithItemsHandler = <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后点击其中的一个item，这时会弹出<strong>成功</strong>的alert。没错，这个block属性就是用来处理点击后的回调。<br><img src="http://upload-images.jianshu.io/upload_images/602268-5daa1f85dbcca227.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="结果回调"></p>
+<p>几个参数说明：<code>activityType</code>为被点击的服务类型；<code>completed</code>标识服务是否执行成功；<code>returnedItems</code>是一个包含<code>NSExtensionItem</code>对象的数组；<code>activityError</code>指出出错原因。更详细的参数说明可以参考<a href="http://developer.apple.com/library/prerelease/ios/documentation/UIKit/Reference/UIActivityViewController_Class/index.html" target="_blank" rel="noopener">官方文档</a></p>
+<p>现在，我们再在调用<code>presentViewController</code>方法之前添加一行代码：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vc.excludedActivityTypes = [<span class="type">UIActivityTypeMail</span>, <span class="type">UIActivityTypeAddToReadingList</span>, <span class="type">UIActivityTypeAssignToContact</span>];</span><br></pre></td></tr></table></figure></p>
+<p>再次运行，可以发现少了<strong>Mail</strong>、<strong>Assign to Contact</strong>、<strong>Add to Reading List</strong>这三个item。是的，<code>excludedActivityTypes</code>这个数组就是用来指定不需要那些服务的。我们可以将不需要的服务写进数组内，具体还有哪些服务，见文档。（注：现在所运行的环境都是在iOS8上的，iOS9后还添加了Notes（备忘录），和Reminders（提醒事项）这两个服务）<br><img src="http://upload-images.jianshu.io/upload_images/602268-3ca6b9596adb94a4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="取消显示不必要是item"><br>标准的基本上就这些，然并卵。。。<br>基本上，仅使用系统默认提供的服务是不够的，每个App有自己的需求，所以自定义服务是必然的。前面说到，通过继承<code>UIActivity</code>来实现自定义，下面来自定义几个常用的服务：微信Timeline，微信Session、新浪微博、拷贝链接。(这里就以微博和拷贝链接为例，其他都大同小异的)</p>
+<ol>
+<li>先创建一个类名为：<code>CustomActivity</code>，继承于<code>UIActivity</code>，以后其他自定义的Activity类直接继承它。代码如下：</li>
+</ol>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> UIKit</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CustomActivity</span>: <span class="title">UIActivity</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> title:<span class="type">String?</span></span><br><span class="line">    <span class="keyword">var</span> image:<span class="type">UIImage?</span></span><br><span class="line">    <span class="keyword">var</span> url:<span class="type">NSURL?</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="class"><span class="keyword">class</span> <span class="title">func</span> <span class="title">activityCategory</span>() -&gt; <span class="title">UIActivityCategory</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> .<span class="type">Share</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">activityType</span><span class="params">()</span></span> -&gt; <span class="type">String?</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="type">NSStringFromClass</span>(<span class="keyword">self</span>.classForCoder)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    返回是否可以执行</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    - parameter activityItems: 从调用处传进来的items，可以通过这个items里面存放的类型数据来判断是否可以执行</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    - returns: 返回true，则这个activity就会在controller上出现；否则，则不会出现</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">canPerformWithActivityItems</span><span class="params">(activityItems: [AnyObject])</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">        <span class="comment">//只要items有数据，就返回true。</span></span><br><span class="line">        <span class="keyword">if</span> activityItems.<span class="built_in">count</span> &gt; <span class="number">0</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    准备数据</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    - parameter activityItems: 数据对象数组</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">prepareWithActivityItems</span><span class="params">(activityItems: [AnyObject])</span></span> &#123;</span><br><span class="line">        <span class="keyword">for</span> activityItem <span class="keyword">in</span> activityItems &#123;</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">let</span> title = activityItem <span class="keyword">as</span>? <span class="type">String</span> &#123;</span><br><span class="line">                <span class="keyword">self</span>.title = title</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> <span class="keyword">let</span> image = activityItem <span class="keyword">as</span>? <span class="type">UIImage</span> &#123;</span><br><span class="line">                <span class="keyword">self</span>.image = image</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> <span class="keyword">let</span> url = activityItem <span class="keyword">as</span>? <span class="type">NSURL</span> &#123;</span><br><span class="line">                <span class="keyword">self</span>.url = url</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    执行点击</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line"><span class="comment">//    override func performActivity() &#123;</span></span><br><span class="line"><span class="comment">//		  super.performActivity()</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//        print(self.title)</span></span><br><span class="line"><span class="comment">//        print(self.image)</span></span><br><span class="line"><span class="comment">//        print(self.url)</span></span><br><span class="line"><span class="comment">//    &#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>几个需要我们override的方法的作用已经在注释上说明，就不多说了。<br>接着，我们创建一个<code>WeiboActivity</code>，如下：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> UIKit</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WeiboActivity</span>: <span class="title">CustomActivity</span> </span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">activityTitle</span><span class="params">()</span></span> -&gt; <span class="type">String?</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"新浪微博"</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">activityImage</span><span class="params">()</span></span> -&gt; <span class="type">UIImage?</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="type">UIImage</span>(named: <span class="string">"weibo"</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">performActivity</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">super</span>.performActivity()</span><br><span class="line"></span><br><span class="line">        <span class="comment">//将需要分享的数据通过微博SDK进行分析</span></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后创建一个<code>CopyLinkActivity</code>类，如下：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> UIKit</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CopyLinkActivity</span>: <span class="title">CustomActivity</span> </span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="class"><span class="keyword">class</span> <span class="title">func</span> <span class="title">activityCategory</span>() -&gt; <span class="title">UIActivityCategory</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> .<span class="type">Action</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">activityTitle</span><span class="params">()</span></span> -&gt; <span class="type">String?</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"拷贝链接"</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">activityImage</span><span class="params">()</span></span> -&gt; <span class="type">UIImage?</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="type">UIImage</span>(named: <span class="string">"share_link"</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">canPerformWithActivityItems</span><span class="params">(activityItems: [AnyObject])</span></span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">	<span class="comment">//因为是拷贝链接，所有如果不存在NSURL对象，则返回false</span></span><br><span class="line">        <span class="keyword">for</span> item <span class="keyword">in</span> activityItems &#123;</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">let</span> <span class="number">_</span> = item <span class="keyword">as</span>? <span class="type">NSURL</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">performActivity</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">super</span>.performActivity()</span><br><span class="line">        <span class="comment">//拷贝需要的链接</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>自定义工作告一段落，现在回到ViewController，将代码改成如下：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> image = <span class="type">UIImage</span>(named: <span class="string">"seed"</span>)</span><br><span class="line"><span class="keyword">let</span> str = <span class="string">"hello iOS9"</span></span><br><span class="line"><span class="keyword">let</span> url = <span class="type">NSURL</span>(string: <span class="string">"http://helloseed.io"</span>)</span><br><span class="line"><span class="keyword">let</span> items:[<span class="type">AnyObject</span>] = [image!, str, url!];</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> weibo = <span class="type">WeiboActivity</span>()		<span class="comment">//实例化WeiboActivity</span></span><br><span class="line"><span class="keyword">let</span> copylink = <span class="type">CopyLinkActivity</span>()	<span class="comment">//实例化CopyLinkActivity</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> vc = <span class="type">UIActivityViewController</span>(activityItems: items, applicationActivities: [weibo, copylink])</span><br><span class="line">vc.excludedActivityTypes = [<span class="type">UIActivityTypeMail</span>, <span class="type">UIActivityTypeAddToReadingList</span>, <span class="type">UIActivityTypeAssignToContact</span>];</span><br><span class="line"><span class="keyword">self</span>.presentViewController(vc, animated: <span class="literal">true</span>, completion: <span class="literal">nil</span>)</span><br><span class="line"></span><br><span class="line">vc.completionWithItemsHandler = &#123;(activityType:<span class="type">String?</span>, completed:<span class="type">Bool</span>, returnedItems:[<span class="type">AnyObject</span>]?, activityError:<span class="type">NSError?</span>) -&gt; <span class="type">Void</span> <span class="keyword">in</span></span><br><span class="line">	<span class="keyword">if</span> completed &#123;</span><br><span class="line">		<span class="keyword">self</span>.alert(<span class="string">"成功"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	vc.completionWithItemsHandler = <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>执行程序：<br><img src="http://upload-images.jianshu.io/upload_images/602268-a05ce6c38f13f3c1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="自定义Activity"></p>
+<p>顺利完成。不过我们发现，点击自定义的activity后，不会调用<code>completionWithItemsHandler</code>方法，即没有弹出<strong>成功</strong>。我的解决方法是，同样自定义一个closure（Objective-C中的block）来执行回调。于是，在<code>CustomActivity</code>中添加：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> finishedBlock:(()-&gt; <span class="type">Void</span>)?</span><br></pre></td></tr></table></figure></p>
+<p>并将上面注释掉的方法<code>performActivity</code>解注释。如下：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">   执行点击</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">   <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">performActivity</span><span class="params">()</span></span> &#123;</span><br><span class="line">       <span class="keyword">super</span>.performActivity()</span><br><span class="line"></span><br><span class="line">       <span class="keyword">if</span> <span class="keyword">let</span> block = <span class="keyword">self</span>.finishedBlock &#123;</span><br><span class="line">           block()</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">self</span>.activityDidFinish(<span class="literal">true</span>)</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样，在调用处想执行什么代码直接添加到<code>finishedBlock</code>即可。<br>再啰嗦一下，其实我们可以连<code>prepareWithActivityItems</code>都不需要override，<code>title</code>,<code>image</code>,<code>url</code>也都不需要定义，<code>CustomActivity</code>的子类也不需要override<code>performActivity</code>了。直接将要执行的代码放到<code>finishedBlock</code>上，类似这样：<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">   执行点击</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">   <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">performActivity</span><span class="params">()</span></span> &#123;</span><br><span class="line">       <span class="keyword">super</span>.performActivity()</span><br><span class="line"></span><br><span class="line">       <span class="keyword">if</span> <span class="keyword">let</span> block = <span class="keyword">self</span>.finishedBlock &#123;</span><br><span class="line">           block()</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">self</span>.activityDidFinish(<span class="literal">true</span>)</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>最后，为Activity提供的图片需要注意的一点：如果Activity的Category是<strong>Share</strong>，则不能是透明的，即关闭透明通道；如果Category是<strong>Action</strong>，则图片需要开启透明通道，因为系统需要将图片渲染成和标准的一样颜色（所以，不需要将图片颜色调成一致，系统会帮我们做），另外，圆角也是系统处理的。</p>
+<p>Demo: <a href="https://github.com/linshaolie/UIActivityViewControllerDemo" target="_blank" rel="noopener">https://github.com/linshaolie/UIActivityViewControllerDemo</a></p>
+<p>参考文章：<br><a href="https://github.com/nixzhu/dev-blog/blob/master/2014-04-22-ui-activity-viewcontroller.md" target="_blank" rel="noopener">https://github.com/nixzhu/dev-blog/blob/master/2014-04-22-ui-activity-viewcontroller.md</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2015/10/04/UIActivityViewController的使用/" data-id="cjs8j1xo10001eun8pddpo5vk" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/UIActivityViewController/">UIActivityViewController</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2015/12/15/React-Native频繁修改IP，烦吗/" class="article-nav-link">
+        <strong class="article-nav-caption">prev</strong>
+        <div class="article-nav-title">
+          
+            React-Native频繁修改IP，烦吗
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2015/09/13/iOS语言本地化/" class="article-nav-link">
+        <strong class="article-nav-caption">下一页</strong>
+        <div class="article-nav-title">iOS语言本地化</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

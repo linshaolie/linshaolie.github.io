@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    Swift到Kotlin轻松转换 |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-Swift到Kotlin轻松转换" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Swift到Kotlin轻松转换
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2017/06/24/Swift到Kotlin轻松转换/" class="article-date">
+  <time datetime="2017-06-23T16:00:00.000Z" itemprop="datePublished">2017-06-24</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p>SwiftKotlin 一个将 Swift 转换成 Kotlin 的工具。</p>
+<p>它是一个框架（动态库），也是一个命令行工具，同时又是一个应用程序。它的功能就是将 Swift 转换成 Kotlin。</p>
+<p>SwiftKotlin 会将 Swift 代码尽可能的转换为 Kotlin 代码，但是目前还是存在一些限制。它不仅进行字符串转换还做了一些更复杂的变换，例如将 guard 语句转换为相反的if语句，属性，内存管理等等。</p>
+<p>既然是翻译工具就不可能完美转换，所以有些时候需要我们自己手动进行一些编辑。但是有了它，多少可以给我们带来便利，下面看看怎么使用。</p>
+<h4 id="命令行工具"><a href="#命令行工具" class="headerlink" title="命令行工具"></a>命令行工具</h4><p>作为命令行工具使用，我们只需要将可执行文件 <strong>swiftkotlin</strong> 拷贝到 <em>/usr/local/bin/</em> 目录下即可。拷贝后执行 <code>swiftkotlin</code> 可以看到命令行帮助菜单。<br><img src="http://upload-images.jianshu.io/upload_images/602268-2942c6bb6f07837c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="执行swiftkontlin命令"></p>
+<p>执行 <code>swiftkotlin 【文件目录】 --output 【输出文件目录】</code> 即可将 swift 文件转换为 kotlin 文件，并存储在指定目录下。如果指定输出目录，则会保存在输入文件相同的目录下。</p>
+<h4 id="桌面应用程序"><a href="#桌面应用程序" class="headerlink" title="桌面应用程序"></a>桌面应用程序</h4><p>作为桌面应用程序使用，其实和安装其他 Mac 桌面应用一样，只需要将应用程序拷贝到 <em>/Applications/</em> 目录下就能打开。界面如下：<br><img src="http://upload-images.jianshu.io/upload_images/602268-6951611a31f156aa.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="界面.png"></p>
+<p>这里额外说一下，怎么让这个项目跑起来。一开始，clone 项目之后，发现根本就运行不起来。(注意是clone 不是 download)</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-2c18167252c77271.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="错误信息"></p>
+<p>查看报错信息，发现缺少文件，到 github 上查看错误信息上说的路径，发现作者引用了一个子模块仓库，这好办，只需要执行 <code>git submodule update --init --recursive</code> 命令，就能将其依赖的子模块 clone 下来了。完成后就能顺利编译运行了。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-3770c17a98f67a6a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="clone子模块"></p>
+<p>既然说到了 <code>git submodule</code>，就顺便也简单的介绍一下好了 \^_^ 。开发过程中，经常会有一些通用的代码希望抽取出来做成一个公共库来给其他的工程使用，而公共代码库的版本管理是个麻烦的事情，这时候 <code>git submodule</code> 出现了。<br>我们可以通过 <code>git submodule add 仓库地址 路径</code> 来为当前工程添加依赖的子模块，执行完命令之后，会自动将子模块 clone 到指定目录下，并且在当前工程根目录下生成一个名为 <em>.gitmodules</em> 的文件，该文件用来记录子模块的信息。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-eef021060603ae7f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="clone子模块成功"></p>
+<p>而 clone 下来的项目，我们需要执行 <code>git submodule update --init --recursive</code>，其中 <code>--recursive</code> 表示递归更新，即当依赖的子模块又依赖其他子模块的时候，就会自动递归去 clone 这些依赖了。</p>
+<h4 id="动态库"><a href="#动态库" class="headerlink" title="动态库"></a>动态库</h4><p>如果你想使用 SwiftKonlin 做点其他额外的东西，它可以作为动态库引用，只需要将 <em>SwfitKontlinFramework.framework</em> 放到自己项目就能使用了，当然具体要用它来做什么这里就不详细介绍了。</p>
+<p>最后，贴上 github 地址： <a href="https://github.com/angelolloqui/SwiftKotlin" target="_blank" rel="noopener">https://github.com/angelolloqui/SwiftKotlin</a></p>
+<p>想获得第一手精彩文章，欢迎关注我的微信公众号：”<strong>iOS和Android干货</strong>“</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/602268-f8b725be715cb7e0.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="扫一扫发现更多精彩文章"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2017/06/24/Swift到Kotlin轻松转换/" data-id="cjs8kdh3e001aeun8v8mdis4o" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/swift-kotlin/">swift kotlin</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2017/07/10/iOS app打包剔除多余文件/" class="article-nav-link">
+        <strong class="article-nav-caption">prev</strong>
+        <div class="article-nav-title">
+          
+            iOS app打包剔除多余文件
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2017/06/13/UIDebuggingInformationOverlay使用介绍/" class="article-nav-link">
+        <strong class="article-nav-caption">下一页</strong>
+        <div class="article-nav-title">UIDebuggingInformationOverlay使用介绍</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

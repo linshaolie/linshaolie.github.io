@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    React Native开篇 |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-React Native开篇" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      React Native开篇
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2016/01/24/React Native开篇/" class="article-date">
+  <time datetime="2016-01-23T16:00:00.000Z" itemprop="datePublished">2016-01-24</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p><em>React Native</em>（之后简写为RN）火了一段时间了，但是当我跟身边的小伙伴提起的时候，好像知道的人并不多，是身边的伙伴Out了吗？其实，这还是得看是否有机会让你去研究的。可能你听了 RN 后根本不在意，也可能你想去了解下他，但是工作很忙，后来也就渐渐念头消失了。当然，如果你是技术宅（Me too）那可能怎样你都能抽出时间去学习。我算幸运了，公司领导是个对新技术有热情的人，所以，公司决定用 RN 重构整个项目。原因有两个：<em>1. 将iOS和Android统一开发，为之后节省大量时间；2. 无需Apple审核，实现动态更新。</em></p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>今天，将对自己这段时间所学，做个总结，当然，也希望读者能从中学到点什么。在学习的过程中，如果遇到什么问题，希望我们也能相互交流。</p>
+<p>下面，我将围绕这几个问题说明：</p>
+<ol>
+<li>学习 RN 有用吗？ </li>
+<li>学习 RN 前需要准备什么？ </li>
+<li>遇到问题怎么办？ …</li>
+</ol>
+<p>我们先不说未来 RN 是否会家喻户晓，我们先了解下他在试图解决什么问题。官方网站有句话：Learn Once, Write Anywhere。学习一种编程语言，实现所有平台的功能（从目前看，这门语言非 Javascript 莫属了）。Facebook表面上是说让Javascript可以实现多平台，其实从另一个层面上说，他在试图解决代码重复编写的问题。意思就是：你没有办法让 1 + 1 = 1, 但是可以实现 1 + 1 &lt;&lt;&lt; 2（远小于2）。 这样说吧，假设你会 iOS 开发，又会 Android 开发，现在让你开发一个 App，你需要写 1 + 1 = 2 这么多的代码，即使你的 Model，你的 View 封装的再好，由于所用的编程语言不同，语法就更不用说了，所以你还是得改改改，然后才能转到另外一个平台去（一般情况下不会这样做的，都是Android和iOS分开开发的）。那现在如果能让 1 + 1 &lt;&lt;&lt; 2 的话，你做不做？你学不学？另外，不管如何，这种思想是正确的，谁不想花少时间开发出同样的产品呢。</p>
+<p>那些只是听过 RN 的人总会误以为 RN 所用的控件都是通过类似 H5 搭建App那样全部基于 web 来实现的，当我像他们提起说公司现在用 RN 重新搭建项目时，他们就会问：那 Native 的控件都不用了吗？性能会不会很差呀？ 其实，不是的，从名字上就可以看出，RN用的是 Native 的控件。RN 上的控件（又叫组件）是通过 Native 上的控件进行封装的，所以我们用的还是 Native 的控件。但是现在 RN 还是有不少<a href="http://facebook.github.io/react-native/docs/known-issues.html#content" target="_blank" rel="noopener">问题</a>的，比如使用的 TableView(ListView) 就没法像 Native 那么高性能了，但是问题总有解决的一天。</p>
+<p>那学习 RN 之前，我们需要什么技能储备呢？前面说了，RN 所使用的编程语言是 Javascript（使用的是jsx）语法，所以</p>
+<ol>
+<li>有点 Javascript的基础是必须的，至少你得知道怎样定义一个变量，怎样定义一个函数（方法），然后稍微理解一下闭包（我就是只懂这些就开始的），闭包的概念现在在很多语言上都有了，Objective-C，swift，Java 等都引入了； </li>
+<li>既然是开发 App，当然某一个平台的编程语言你是必须熟悉的。如果你已经是 iOS 或者 Android 开发者那就不用说了;</li>
+<li>flex-box 的布局方式你得先了解下，这对你的开发适配有很大的帮助。</li>
+</ol>
+<p>下面说说我是怎样准备这些的：</p>
+<ol>
+<li>Javascript可以说我基本上都是不懂的，之前想学，但是都没机会。只知道<code>var</code>来定义变量，通过看其他源码例子，不懂就查（如数组元素怎样拼接成字符串，字符串怎样分割成数组这些很基本的函数调用，方法名其实跟其他语言的都基本一样），现在写出某个功能已经基本上没问题了，遇到不懂的语法就查下；</li>
+<li>因为我是做iOS开发的，所以对Objective-C还是有信心的（这样决定了我后面写的一些实现都只涉及到iOS，当然，很多都是和Android通用的）;</li>
+<li>我是这样学 flex-box 的，先看一遍这篇文章：<a href="http://www.w3cplus.com/css3/a-guide-to-flexbox.html" target="_blank" rel="noopener">一个完整的Flexbox指南</a>或这篇<a href="http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html" target="_blank" rel="noopener">Flex布局教程：语法篇</a>了解了它大概能怎样进行布局，然后这篇文章我就没再关掉过了（至少到现在都没关掉这个网页），还是那句话，不记得的时候就看一下，渐渐的就熟悉了。就这样我开始了 RN 开发项目之旅。</li>
+</ol>
+<p>最后一个问题，遇到问题怎么办？ 现在我知道的是国内有几个中文社区，如<a href="http://react-china.org" target="_blank" rel="noopener">React-China</a>, <a href="http://bbs.reactnative.cn" target="_blank" rel="noopener">React Native中文社区</a>。国外资料的话，首先 Facebook 的官方文档已经有很详细的使用说明了。但是我们遇到其他各式各样的问题，如果遇到不懂的语法直接 google基本上就够了，而如果发现了 RN 的 bug 之类的，我们可以直接去 RN 的 github 上去查 issue，没准其他人也已经发现了，如果实在没有，那就只能自己发 issue 了。另外，RN 现在更新很快，基本上两三个星期就有个新的版本了，所以，今天发现的 bug 可能明天就被修复了。</p>
+<p>，</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2016/01/24/React Native开篇/" data-id="cjs8jz14z000reun8w67o1ybe" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RN/">RN</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+      <a href="/2016/01/24/React Native环境搭建/" class="article-nav-link">
+        <strong class="article-nav-caption">prev</strong>
+        <div class="article-nav-title">
+          
+            React Native环境搭建
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2016/01/24/Flow的简单使用/" class="article-nav-link">
+        <strong class="article-nav-caption">下一页</strong>
+        <div class="article-nav-title">Flow的简单使用</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>

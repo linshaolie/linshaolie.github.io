@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    读《代码整洁之道》 |
+    
+    木木少烈</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+</html>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-读《代码整洁之道》" class="article article-type-post" itemscope="" itemprop="blogPost">
+
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      读《代码整洁之道》
+    </h1>
+  
+
+      </header>
+    
+
+    
+      <div class="article-meta">
+        <a href="/2018/07/01/读《代码整洁之道》/" class="article-date">
+  <time datetime="2018-06-30T16:00:00.000Z" itemprop="datePublished">2018-07-01</time>
+</a>
+        
+      </div>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+      
+        <p><img src="https://upload-images.jianshu.io/upload_images/602268-28943fcf86d2e485.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/300" alt="代码整洁之道-程序员的职业素养.jpg"></p>
+<p>借部门的一次读书会上，我挑选了 Bob大叔的《代码整洁之道》这本书。在读了这本书的前面几章节时就觉得感触极大，今天刚好读完，希望下面我的感受也能帮到想成为专业程序员的你。</p>
+<h3 id="什么是专业程序员"><a href="#什么是专业程序员" class="headerlink" title="什么是专业程序员"></a>什么是专业程序员</h3><p>专业程序员并不好当。<br>作为一个专业程序员，最重要的一条是<strong>坚守原则，为自己的承诺负责</strong>。如何坚守？在面对外界（项目经理，产品经理，客户等）强制的要求时，应该用自己专业的知识去衡量问题的可行性，而不是轻易妥协。<br><em>“试试看”</em> 这类的词不应该从一个专业程序员口中说出，因为你说的“试试看”对你来说是代表着可能完成，可能完成不了，但是在外人听来，他们认为你说的是可以完成，而最终当问题没法在他们预期的时间完成时，受到影响的不单单是公司的利益，你的信誉也收到了损害。<br>所以，在面对一个自己觉得没法在指定时间完成的任务，应该坚决的<strong>说不</strong>，并且坚持这个底线。而在觉得问题可行的情况下，也应该准确的<strong>说是</strong>，并为自己的承诺负责。</p>
+<p>专业的程序员并不代表什么都懂，他们勇于接受他人的帮助，知道什么时候该<strong>结对编程</strong>。同时，他们也乐于帮助其他人，辅导新人。他们会抽出时间去阅读，编码来提升自己。</p>
+<p>专业的程序员对自己的每一行代码负责，没经过测试的代码绝不提交。<br>我们应该把“QA应该找不到任何错误”作为努力目标，对QA找到的每一个问题，都应该高度重视、认真对待。应该反思为什么会出现这种错误，并采取措施避免今后重犯。</p>
+<h3 id="测试驱动编程（TDD"><a href="#测试驱动编程（TDD" class="headerlink" title="测试驱动编程（TDD)"></a>测试驱动编程（TDD)</h3><p>什么是TDD？简单来说就是：先写测试，再写功能。这听起来好像很扯，但是了解其意义之后，你会为TDD喝彩。<br>因为自己这段时间也在负责部门 React-Native 项目单元测试的实践（不过并没有执行TDD，而是采用了相反的方式，即先功能后测试）。<br>过程中，深刻体会到单元测试其中的一个好处：<em>强迫自己抽象，再抽象</em>。为了让自己所写的函数可测试，你需要做到尽量让其内部逻辑简洁，单一，耦合性低，否则你根本就测不了它，或者说你要写更多的case才能完整覆盖它。<br>其好处自然就很明显了：</p>
+<ol>
+<li>通过测试的代码，我们可以很有信心的将他提交；</li>
+<li>简洁的代码，既提高其可读性，也提高其健壮性。</li>
+</ol>
+<p>TDD相关的书籍我没阅读过，借助作者的简单描述，我在项目的一个模块重构上做了实践，效果是真不错。之后也打算更深层次的去理解它，并在以后的项目上加以实践。</p>
+<p>作者提到了TDD 的三项法则，这里摘抄了下来：</p>
+<ol>
+<li>在编好失败单元测试之前，不要编写任何产品代码；</li>
+<li>只要有一个单元测试失败了，就不要再写测试代码：无法通过编译也是一种失败情况；</li>
+<li>产品代码恰好能够让当前失败的单元测试成功通过即可，不要多写。    </li>
+</ol>
+<h3 id="时间管理"><a href="#时间管理" class="headerlink" title="时间管理"></a>时间管理</h3><p>这部分应该说不单单是面向专业程序员，而是面向所有希望走向成功的人。<br>毫不夸张的说：能否对自己时间有个好的管理是决定你能走多远的必要条件。但是我们大多都做的不够好，甚至一塌糊涂。从专业程序员角度，作者也说了下面几点：</p>
+<ul>
+<li>如果发现参加某个会议是在浪费时间，就应当想个礼貌的办法退出来，继续参加对你没有太多意义的会议，是不专业的行为。你有责任合理分配老板给你的时间和金钱，所以，选个合适的机会离席，并非不专业的行为。</li>
+<li>如果观点无法在短时间（5-30分钟）里达成一致，就永远无法达成一致。唯一的出路是，用数据说话。</li>
+<li>注意力点数会随时间流逝而减少，使用合理的方式进行恢复：充足的睡眠（不熬夜的情况下7-8个小时足够了）；也可以选择小憩，看杂志等方式；另外可以通过训练肌肉注意力（骑车，吉他等方式）来提升自身的心智注意力。</li>
+<li>番茄工作法</li>
+<li>如果你掉进了坑里，别挖</li>
+<li>陷入泥潭，别继续往前</li>
+</ul>
+<p>在参加会议这块，我经常表现的不够专业，参加了一个会议或者讲座，发现根本听不下去或绝对对自己没什么用处，但是又不好意思中途离开，所以就干脆玩起了手机。最后讲座没收获，自己时间也浪费了。在看了作者说的话后，默默的给以后的自己提了个醒。</p>
+<hr>
+<p>番茄工作法的书籍我也读过，也因此在App Store上买了个便宜的软件（穷哭），但是实践起来是真的难，排除掉那些繁琐的步骤，你需要做的就是：</p>
+<ol>
+<li>列出你当天要做的事情；</li>
+<li>启动番茄钟（一般设置25分钟），开始执行任务；</li>
+<li>时间到就停止手中的事情，休息5分钟。（3个番茄钟结束后休息15分钟）</li>
+</ol>
+<p>难就难在，在番茄钟的25分钟里，你需要专注，高效率的去执行。但是，自身的注意力以及外界的突然打扰总是会让我分心。这一分心，回头再看下时间，番茄钟快结束了，我还什么都没做呢。<br>番茄钟工作法其中一个重要原则是：<strong>严格按照番茄钟去工作，该工作时认真工作，该休息时认真休息</strong>。这样做的好处是：可以培养你在短时间内快速进入专注状态，因为你必须在这25分钟里高效输出。<br>番茄工作法我目前也在实践着，不过每次受到外界因素影响时我都没法说出：等我20分钟之类的话。当我能很好的去遵循番茄工作法时我也会给大家分享下我更多的心得。（番茄钟到了，我休息5分钟）</p>
+<hr>
+<p>代码总是会随着业务功能的增删改而变的混乱，之前设计很好的实现方式，也会逐渐不适用，这时是选择继续用这种设计方式去实现新功能，还是推翻重构呢？作为专业程序员，应该清楚的认识到，继续以这种方式去迭代，只会导致后面开发效率越来越低，代码也变得很难维护。刚进入泥潭你可能可以继续往前，但是你会发现，你会越走越慢，最后进退两难。所以，重构是明智的选择。</p>
+<p>引用书的最后，触动到我的一句话：</p>
+<blockquote>
+<p>你还记得你写的第一个程序跑起来的那个时刻吗？它改变了你的生活并指引你大步踏上编程之路了吗？</p>
+</blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <br>
+      <a data-url="http://linshaolie.github.io/2018/07/01/读《代码整洁之道》/" data-id="cjs8kqb4c0024eun87lgngv0d" class="article-share-link">分享</a>
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/读后感/">读后感</a></li></ul>
+
+    </footer>
+
+  </div>
+
+  
+    
+  <nav class="article-nav">
+    
+    
+      <a href="/2017/08/30/Xcode 9 模拟器新特性/" class="article-nav-link">
+        <strong class="article-nav-caption">下一页</strong>
+        <div class="article-nav-title">Xcode 9 模拟器新特性</div>
+      </a>
+    
+  </nav>
+
+
+  
+
+  
+    
+  
+
+</article>
+
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <ul class="list-inline">
+      <li>&copy; 2019 木木少烈</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://linshaolie.github.io">linshaolie</a></li>
+      <!--
+      <li><a href="/">Charlie</a></li>
+      -->
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/logoko-2.png" alt="木木少烈"></a>
+    </div>
+  
+  <div class="nav nav-main">
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/">首页</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/archives">归档</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/gallery">相册</a>
+      </div>
+    
+      <div class="nav-item">
+        <a class="nav-item-link" href="/about">关于</a>
+      </div>
+    
+    <div class="nav-item">
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="fe fe-search"></i>
+        搜索
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- <nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav> -->
+
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+
+</aside>
+  <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+</body>
+</html>
